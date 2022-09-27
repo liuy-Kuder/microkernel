@@ -2,7 +2,7 @@
 
 "D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\bin\armjlink2.dll" 
 
-"F:\项目开发中\stm32f407zgt6\mk_stm32\development\EWARM\MK_STM32\Exe\MK_STM32.out" 
+"F:\项目开发中\stm32f407zgt6\microkernel\EWARM\MK_STM32\Exe\MK_STM32.out" 
 
 --plugin="D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\bin\armbat.dll" 
 

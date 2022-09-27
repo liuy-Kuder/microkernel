@@ -25,7 +25,7 @@ if not "%~1" == "" goto debugFile
 
 @echo on 
 
-"D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "F:\项目开发中\stm32f407zgt6\mk_stm32\development\EWARM\settings\MK_STM32.MK_STM32.general.xcl" --backend -f "F:\项目开发中\stm32f407zgt6\mk_stm32\development\EWARM\settings\MK_STM32.MK_STM32.driver.xcl" 
+"D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "F:\项目开发中\stm32f407zgt6\microkernel\EWARM\settings\MK_STM32.MK_STM32.general.xcl" --backend -f "F:\项目开发中\stm32f407zgt6\microkernel\EWARM\settings\MK_STM32.MK_STM32.driver.xcl" 
 
 @echo off 
 goto end 
@@ -34,7 +34,7 @@ goto end
 
 @echo on 
 
-"D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "F:\项目开发中\stm32f407zgt6\mk_stm32\development\EWARM\settings\MK_STM32.MK_STM32.general.xcl" "--debug_file=%~1" --backend -f "F:\项目开发中\stm32f407zgt6\mk_stm32\development\EWARM\settings\MK_STM32.MK_STM32.driver.xcl" 
+"D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "F:\项目开发中\stm32f407zgt6\microkernel\EWARM\settings\MK_STM32.MK_STM32.general.xcl" "--debug_file=%~1" --backend -f "F:\项目开发中\stm32f407zgt6\microkernel\EWARM\settings\MK_STM32.MK_STM32.driver.xcl" 
 
 @echo off 
 :end

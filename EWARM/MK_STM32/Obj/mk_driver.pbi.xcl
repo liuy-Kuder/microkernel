@@ -1,9 +1,9 @@
-"F:\项目开发中\stm32f407zgt6\microkernel\Core\Src\main.c"
+"F:\项目开发中\stm32f407zgt6\microkernel\MicroKernel\core\mk_driver.c"
 -std=c11
 -ferror-limit=0
 -fbracket-depth=512
 -I
-F:\项目开发中\stm32f407zgt6\microkernel\Core\Src
+F:\项目开发中\stm32f407zgt6\microkernel\MicroKernel\core
 -I
 F:\项目开发中\stm32f407zgt6\microkernel\EWARM/../Core/Inc
 -I

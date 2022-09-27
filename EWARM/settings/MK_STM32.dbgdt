@@ -1034,7 +1034,7 @@
                     <item>id</item>
                     <item>buf</item>
                     <item>test_dev</item>
-                    <item></item>
+                    <item />
                 </expressions>
                 <col-names>
                     <item>Expression</item>
