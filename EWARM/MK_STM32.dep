@@ -1,0 +1,570 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <fileVersion>4</fileVersion>
+    <fileChecksum>2149286193</fileChecksum>
+    <configuration>
+        <name>MK_STM32</name>
+        <outputs>
+            <file>$PROJ_DIR$\MK_STM32\Obj\stm32f4xx_ll_exti.o</file>
+            <file>$PROJ_DIR$\..\MicroKernel\core\mk_driver.h</file>
+            <file>$PROJ_DIR$\..\MicroKernel\include\rtos.h</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\stm32f4xx_it.o</file>
+            <file>$TOOLKIT_DIR$\inc\c\yvals.h</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\stm32f4xx_ll_utils.pbi</file>
+            <file>$PROJ_DIR$\..\MicroKernel\filesystem\vfs.h</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\mk_gpio_drv.pbi</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Include\cmsis_version.h</file>
+            <file>$TOOLKIT_DIR$\lib\rt7M_tl.a</file>
+            <file>$PROJ_DIR$\..\Core\Inc\stm32f4xx_it.h</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\mk_device.pbi</file>
+            <file>$PROJ_DIR$\..\MicroKernel\cjson\cJSON_Utils.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_ll_cortex.h</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\stm32f4xx_it.pbi</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\mk_kobj.pbi</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\stm32f4xx_ll_gpio.o</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Include\cmsis_compiler.h</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\stm32f4xx_ll_utils.o</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\adc_driver.pbi</file>
+            <file>$TOOLKIT_DIR$\inc\c\stddef.h</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\stm32f4xx_ll_exti.pbi</file>
+            <file>$PROJ_DIR$\..\MicroKernel\core\mk_list.h</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\vfs.o</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\vfs.pbi</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Device\ST\STM32F4xx\Include\system_stm32f4xx.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\stdlib.h</file>
+            <file>$PROJ_DIR$\..\MicroKernel\filesystem\sysfs.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_ll_bus.h</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\mk_driver.pbi</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\mk_gpio_dev.o</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\startup_stm32f407xx.o</file>
+            <file>$TOOLKIT_DIR$\inc\c\DLib_Defaults.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_ll_pwr.h</file>
+            <file>$PROJ_DIR$\..\MicroKernel\core\mk_device.h</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\mk_gpio_dev.pbi</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\system_stm32f4xx.pbi</file>
+            <file>$TOOLKIT_DIR$\inc\c\DLib_Product.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\ctype.h</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\mk_device.o</file>
+            <file>$PROJ_DIR$\..\Core\Inc\mk_gpio_drv.h</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\sysfs.o</file>
+            <file>$TOOLKIT_DIR$\inc\c\float.h</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\stm32f4xx_ll_gpio.pbi</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_ll_dma.h</file>
+            <file>$TOOLKIT_DIR$\lib\dl7M_tlf.a</file>
+            <file>$PROJ_DIR$\..\Core\Inc\adc_device.h</file>
+            <file>$PROJ_DIR$\..\MicroKernel\core\mk_kobj.c</file>
+            <file>$TOOLKIT_DIR$\inc\c\math.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\ycheck.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_ll_exti.h</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\mk_setup.o</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Include\cmsis_iccarm.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\stdint.h</file>
+            <file>$PROJ_DIR$\..\MicroKernel\cjson\cJSON_Utils.c</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\system_stm32f4xx.o</file>
+            <file>$PROJ_DIR$\..\MicroKernel\include\microkernel.h</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\cJSON_Utils.pbi</file>
+            <file>$PROJ_DIR$\..\Core\Inc\main.h</file>
+            <file>$TOOLKIT_DIR$\lib\shb_l.a</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\adc_driver.o</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_ll_system.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\string.h</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\kobj.o</file>
+            <file>$PROJ_DIR$\..\MicroKernel\core\kobj.h</file>
+            <file>$PROJ_DIR$\..\MicroKernel\core\mk_setup.h</file>
+            <file>$PROJ_DIR$\..\MicroKernel\cjson\cJSON.c</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\adc_device.o</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_ll_rcc.h</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\adc_device.pbi</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\main.pbi</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_ll_gpio.h</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\sysfs.pbi</file>
+            <file>$TOOLKIT_DIR$\inc\c\ysizet.h</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f407xx.h</file>
+            <file>$PROJ_DIR$\stm32f407xx_flash.icf</file>
+            <file>$PROJ_DIR$\..\MicroKernel\cjson\cJSON.h</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\stm32f4xx_ll_rcc.pbi</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\mk_driver.o</file>
+            <file>$TOOLKIT_DIR$\inc\c\DLib_Product_string.h</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\stm32f4xx_ll_rcc.o</file>
+            <file>$TOOLKIT_DIR$\inc\c\DLib_Config_Full.h</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Include\core_cm4.h</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\main.o</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\cJSON.pbi</file>
+            <file>$PROJ_DIR$\MK_STM32\List\MK_STM32.map</file>
+            <file>$PROJ_DIR$\MK_STM32\Exe\MK_STM32.out</file>
+            <file>$PROJ_DIR$\..\Core\Inc\adc_driver.h</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\MK_STM32.pbd</file>
+            <file>$TOOLKIT_DIR$\inc\c\stdarg.h</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\mk_gpio_drv.o</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\mk_setup.pbi</file>
+            <file>$PROJ_DIR$\MK_STM32\Obj\kobj.pbi</file>
+            <file>$PROJ_DIR$\..\MicroKernel\filesystem\vfs.c</file>
+            <file>$PROJ_DIR$\..\Core\Src\system_stm32f4xx.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_exti.c</file>
+            <file>$TOOLKIT_DIR$\inc\c\limits.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_utils.c</file>
+            <file>$PROJ_DIR$\..\Core\Src\stm32f4xx_it.c</file>
+            <file>$PROJ_DIR$\..\MicroKernel\core\kobj.c</file>
+            <file>$PROJ_DIR$\..\Core\Src\main.c</file>
+            <file>$PROJ_DIR$\..\MicroKernel\filesystem\sysfs.c</file>
+            <file>$TOOLKIT_DIR$\inc\c\DLib_Product_stdlib.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_rcc.c</file>
+            <file>$PROJ_DIR$\..\Core\Src\mk_gpio_dev.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_ll_utils.h</file>
+            <file>$TOOLKIT_DIR$\lib\m7M_tls.a</file>
+            <file>$PROJ_DIR$\..\Core\Src\mk_gpio_drv.c</file>
+            <file>$PROJ_DIR$\..\MicroKernel\core\mk_driver.c</file>
+            <file>$PROJ_DIR$\..\MicroKernel\core\mk_setup.c</file>
+            <file>$PROJ_DIR$\..\Core\Src\adc_driver.c</file>
+            <file>$TOOLKIT_DIR$\inc\c\stdio.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_gpio.c</file>
+            <file>$TOOLKIT_DIR$\inc\c\iccarm_builtin.h</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Include\mpu_armv7.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\DLib_float_setup.h</file>
+            <file>$PROJ_DIR$\..\MicroKernel\core\mk_device.c</file>
+            <file>$PROJ_DIR$\MK_STM32\Exe\MK_STM32.bin</file>
+            <file>$PROJ_DIR$\..\Core\Src\adc_device.c</file>
+            <file>$PROJ_DIR$\startup_stm32f407xx.s</file>
+        </outputs>
+        <file>
+            <name>[ROOT_NODE]</name>
+            <outputs>
+                <tool>
+                    <name>ILINK</name>
+                    <file> 87 86</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\MicroKernel\core\mk_kobj.c</name>
+            <outputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 15</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\MicroKernel\cjson\cJSON_Utils.c</name>
+            <outputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 57</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 12 73 103 97 26 42 4 49 79 62 112 48 32 81 37 38 116 76 20</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\MicroKernel\cjson\cJSON.c</name>
+            <outputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 85</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 79 4 97 49 48 42 73 112 26 38 76 32 81 37 116 62 103 20</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\MK_STM32\Exe\MK_STM32.out</name>
+            <outputs>
+                <tool>
+                    <name>ILINK</name>
+                    <file> 86</file>
+                </tool>
+                <tool>
+                    <name>OBJCOPY</name>
+                    <file> 118</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ILINK</name>
+                    <file> 75 67 60 63 84 39 78 30 91 51 31 3 0 16 80 18 41 55 23 59 9 107 45</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\MicroKernel\filesystem\vfs.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 23</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 24</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 56 62 49 4 32 81 37 73 79 26 103 20 53 112 64 22 1 34 27 6 2 52 114</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Core\Src\system_stm32f4xx.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 55</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 36</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 82 74 83 53 49 4 32 81 37 8 17 52 114 115 25</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 83 8 49 4 53 37 52 74 25 17 81 82 115 32 114</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_exti.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 0</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 21</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 50 82 74 83 53 49 4 32 81 37 8 17 52 114 115 25</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 53 8 49 4 83 37 52 50 82 74 25 17 81 115 32 114</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_utils.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 18</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 5</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 106 82 74 83 53 49 4 32 81 37 8 17 52 114 115 25 68 61 33</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 25 53 74 82 61 115 4 32 114 68 33 83 8 17 49 81 37 52 106</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Core\Src\stm32f4xx_it.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 3</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 14</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 58 68 82 74 83 53 49 4 32 81 37 8 17 52 114 115 25 28 61 50 13 106 33 44 71 10</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 74 106 25 53 28 4 82 50 44 115 37 52 10 68 61 13 33 71 83 8 17 49 81 58 32 114</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\MicroKernel\core\kobj.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 63</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 93</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 56 62 49 4 32 81 37 73 79 26 103 20 53 112 64 22 1 34 27 6 2 52 114</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Core\Src\main.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 84</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 70</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 58 68 82 74 83 53 49 4 32 81 37 8 17 52 114 115 25 28 61 50 13 106 33 44 71 88 56 62 73 79 26 103 20 112 64 22 1 34 27 6 2 46 40</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 82 4 13 27 40 68 71 114 26 73 49 6 46 61 33 25 37 52 56 64 53 88 90 28 50 106 44 74 83 32 81 34 2 58 8 17 115 62 20 112 1 22 79 103</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\MicroKernel\filesystem\sysfs.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 41</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 72</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 56 62 49 4 32 81 37 73 79 26 103 20 53 112 64 22 1 34 27 6 2 52 114</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_rcc.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 80</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 77</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 68 82 74 83 53 49 4 32 81 37 8 17 52 114 115 25</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 53 8 49 4 37 52 68 82 83 17 81 74 25 115 32 114</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Core\Src\mk_gpio_dev.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 30</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 35</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 56 62 49 4 32 81 37 73 79 26 103 20 53 112 64 22 1 34 27 6 2 52 114</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 81 64 32 4 26 27 73 56 53 34 2 37 49 112 62 20 1 22 6 52 79 103 114</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Core\Src\mk_gpio_drv.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 91</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 7</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 56 62 49 4 32 81 37 73 79 26 103 20 53 112 64 22 1 34 27 6 2 52 114 40 71 82 74 83 8 17 115 25</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\MicroKernel\core\mk_driver.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 78</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 29</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 56 62 49 4 32 81 37 73 79 26 103 20 53 112 64 22 1 34 27 6 2 52 114</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 53 2 4 34 37 49 56 26 64 27 32 81 73 62 20 112 1 22 6 52 79 103 114</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\MicroKernel\core\mk_setup.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 51</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 92</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 56 62 49 4 32 81 37 73 79 26 103 20 53 112 64 22 1 34 27 6 2 52 114</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Core\Src\adc_driver.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 60</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 19</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 56 62 49 4 32 81 37 73 79 26 103 20 53 112 64 22 1 34 27 6 2 52 114 88</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_gpio.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 16</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 43</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 71 82 74 83 53 49 4 32 81 37 8 17 52 114 115 25 28</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 32 4 115 82 74 28 25 114 71 83 53 8 17 49 81 37 52</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\MicroKernel\core\mk_device.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 39</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 11</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 56 62 49 4 32 81 37 73 79 26 103 20 53 112 64 22 1 34 27 6 2 52 114 65</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 1 37 49 20 6 22 56 53 114 62 112 52 4 32 81 73 65 26 64 34 27 2 79 103</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Core\Src\adc_device.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 67</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 69</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 56 62 49 4 32 81 37 73 79 26 103 20 53 112 64 22 1 34 27 6 2 52 114 88</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\startup_stm32f407xx.s</name>
+            <outputs>
+                <tool>
+                    <name>AARM</name>
+                    <file> 31</file>
+                </tool>
+            </outputs>
+        </file>
+    </configuration>
+</project>
