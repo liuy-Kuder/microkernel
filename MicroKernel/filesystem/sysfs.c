@@ -1,39 +1,69 @@
+/********************************************************************
+*
+*文件名称：sysfs.c
+*内容摘要：提供文件系统所需的驱动、总线的底层调用
+*当前版本：V1.0
+*作者：刘杨
+*完成时期：2022.10.3
+*其他说明: none
+*
+**********************************************************************/
+
 #include "microkernel.h"
 #include "sysfs.h"
 #include "vfs.h"
+#include "rtos.h"
 
+/********************************************************************
+*                      功能函数
+*功能描述： 系统挂载
+*输入参数：dev
+*返回值：kobj节点
+*其他说明：无
+*修改日期       版本      修改人        修改内容
+*---------------------------------------------------------------------
+*2022.10.03     1.0        刘杨
+**********************************************************************/
 static int sys_mount(struct vfs_mount_t * m, const char * dev)
 {
 	if(dev)
 		return -1;
 
-	m->m_flags |= MOUNT_RO;
+	m->m_flags |= MOUNT_RW;
 	m->m_root->v_data = (void *)kobj_get_root();
 	m->m_data = NULL;
 	return 0;
 }
 
+/********************************************************************
+*                      功能函数
+*功能描述： 系统卸载
+*输入参数：vfs_mount_t 结构参数
+*返回值：OK
+*其他说明：无
+*修改日期       版本      修改人        修改内容
+*---------------------------------------------------------------------
+*2022.10.03     1.0        刘杨
+**********************************************************************/
 static int sys_unmount(struct vfs_mount_t * m)
 {
 	m->m_data = NULL;
 	return 0;
 }
 
-static int sys_msync(struct vfs_mount_t * m)
-{
-	return 0;
-}
-
-static int sys_vget(struct vfs_mount_t * m, struct vfs_node_t * n)
-{
-	return 0;
-}
-
-static int sys_vput(struct vfs_mount_t * m, struct vfs_node_t * n)
-{
-	return 0;
-}
-
+/********************************************************************
+*                      功能函数
+*功能描述： 读取
+*输入参数：n: kobj节点信息
+*		  off: 偏移地址
+*		  buf: 接收缓冲区
+*		  len: 接收长度
+*返回值：接收长度
+*其他说明：无
+*修改日期       版本      修改人        修改内容
+*---------------------------------------------------------------------
+*2022.10.03     1.0        刘杨
+**********************************************************************/
 static uint64_t sys_read(struct vfs_node_t * n, int64_t off, void * buf, uint64_t len)
 {
 	struct kobj_t * kobj;
@@ -50,6 +80,19 @@ static uint64_t sys_read(struct vfs_node_t * n, int64_t off, void * buf, uint64_
 	return 0;
 }
 
+/********************************************************************
+*                      功能函数
+*功能描述：写入
+*输入参数：n: kobj节点信息
+*		  off: 偏移地址
+*		  buf: 写入缓冲区
+*		  len: 写入长度
+*返回值：写入长度
+*其他说明：无
+*修改日期       版本      修改人        修改内容
+*---------------------------------------------------------------------
+*2022.10.03     1.0        刘杨
+**********************************************************************/
 static uint64_t sys_write(struct vfs_node_t * n, int64_t off, void * buf, uint64_t len)
 {
 	struct kobj_t * kobj;
@@ -66,6 +109,18 @@ static uint64_t sys_write(struct vfs_node_t * n, int64_t off, void * buf, uint64
 	return 0;
 }
 
+/********************************************************************
+*                      功能函数
+*功能描述：控制
+*输入参数：n: kobj节点信息
+*		  cmd: 命令
+*		  buf: 附带的参数，建议写NULL
+*返回值：OK
+*其他说明：无
+*修改日期       版本      修改人        修改内容
+*---------------------------------------------------------------------
+*2022.10.03     1.0        刘杨
+**********************************************************************/
 static uint64_t sys_ioctl(struct vfs_node_t * n, uint16_t cmd, void * buf)
 {
 	struct kobj_t * kobj;
@@ -81,16 +136,18 @@ static uint64_t sys_ioctl(struct vfs_node_t * n, uint16_t cmd, void * buf)
 	return 0;
 }
 
-static int sys_truncate(struct vfs_node_t * n, int64_t off)
-{
-	return -1;
-}
-
-static int sys_sync(struct vfs_node_t * n)
-{
-	return 0;
-}
-
+/********************************************************************
+*                      功能函数
+*功能描述：读取目录
+*输入参数：dn: kobj节点信息
+*		  off: 偏移地址
+*		  d: 返回目录信息
+*返回值：写入长度
+*其他说明：无
+*修改日期       版本      修改人        修改内容
+*---------------------------------------------------------------------
+*2022.10.03     1.0        刘杨
+**********************************************************************/
 static int sys_readdir(struct vfs_node_t * dn, int64_t off, struct vfs_dirent_t * d)
 {
 	struct kobj_t * kobj, * obj;
@@ -120,7 +177,18 @@ static int sys_readdir(struct vfs_node_t * dn, int64_t off, struct vfs_dirent_t 
 
 	return 0;
 }
-//
+/********************************************************************
+*                      功能函数
+*功能描述：向上查找
+*输入参数：dn: kobj节点信息
+*		  name: 偏移地址
+*		  n: 返回目录信息
+*返回值：写入长度
+*其他说明：无
+*修改日期       版本      修改人        修改内容
+*---------------------------------------------------------------------
+*2022.10.03     1.0        刘杨
+**********************************************************************/
 static int sys_lookup(struct vfs_node_t * dn, const char * name, struct vfs_node_t * n)
 {
 	struct kobj_t * kobj, * obj;
@@ -151,38 +219,10 @@ static int sys_lookup(struct vfs_node_t * dn, const char * name, struct vfs_node
 			n->v_mode |= (S_IRUSR | S_IRGRP | S_IROTH);
 		if(obj->write)
 			n->v_mode |= (S_IWUSR | S_IWGRP | S_IWOTH);
+		if(obj->ioctl)
+			n->v_mode |= (S_IWUSR | S_IWGRP | S_IWOTH);
 	}
 	return 0;
-}
-
-static int sys_create(struct vfs_node_t * dn, const char * filename, uint32_t mode)
-{
-	return -1;
-}
-
-static int sys_remove(struct vfs_node_t * dn, struct vfs_node_t * n, const char *name)
-{
-	return -1;
-}
-
-static int sys_rename(struct vfs_node_t * sn, const char * sname, struct vfs_node_t * n, struct vfs_node_t * dn, const char * dname)
-{
-	return -1;
-}
-
-static int sys_mkdir(struct vfs_node_t * dn, const char * name, uint32_t mode)
-{
-	return -1;
-}
-
-static int sys_rmdir(struct vfs_node_t * dn, struct vfs_node_t * n, const char *name)
-{
-	return -1;
-}
-
-static int sys_chmod(struct vfs_node_t * n, uint32_t mode)
-{
-	return -1;
 }
 
 static struct filesystem_t sys = {
@@ -196,20 +236,6 @@ static struct filesystem_t sys = {
 	.ioctl		= sys_ioctl,
 	.readdir	= sys_readdir,
 	.lookup		= sys_lookup,
-#if 1
-	.msync		= sys_msync,
-	.vget		= sys_vget,
-	.vput		= sys_vput,
-
-	.truncate	= sys_truncate,
-	.sync		= sys_sync,
-	.create		= sys_create,
-	.remove		= sys_remove,
-	.rename		= sys_rename,
-	.mkdir		= sys_mkdir,
-	.rmdir		= sys_rmdir,
-	.chmod		= sys_chmod,
-#endif
 };
 
 void filesystem_sys_init(void)

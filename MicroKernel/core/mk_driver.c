@@ -1,6 +1,6 @@
 /********************************************************************
 *
-*文件名称：driver.c
+*文件名称：mk_driver.c
 *内容摘要：提供总线读写平台
 *当前版本：V1.0
 *作者：刘杨
@@ -9,6 +9,7 @@
 *
 **********************************************************************/
 #include "microkernel.h"
+#include "../log/mk_log.h"
 
 static struct hlist_head __driver_hash[CONFIG_DRIVER_HASH_SIZE];
 
@@ -70,17 +71,35 @@ struct driver_t * search_driver(const char * name)
 **********************************************************************/
 uint8_t register_driver(struct driver_t * drv)
 {
+	char Ibuf[128];
+
 	if(!drv || !drv->name)//空或无名字、返回假
+	 {
+		sprintf(Ibuf,"%s register driver fail!",drv->name);
+		MK_LOG_ERROR(Ibuf);
 		return FALSE;
+	 }
 
 	if(!drv->probe || !drv->remove)//无管道或无移除、返回假
+	 {
+		sprintf(Ibuf,"%s register driver fail!",drv->name);
+		MK_LOG_ERROR(Ibuf);
 		return FALSE;
+	 }
 
 	if(!drv->suspend || !drv->resume)//无暂停或无释放、返回假
+	 {
+		sprintf(Ibuf,"%s register driver fail!",drv->name);
+		MK_LOG_ERROR(Ibuf);
 		return FALSE;
+	 }
 
 	if(search_driver(drv->name))//寻找驱动名，如果相同则返回假
+	 {
+		sprintf(Ibuf,"%s register driver fail!",drv->name);
+		MK_LOG_ERROR(Ibuf);
 		return FALSE;
+	 }
 
 	drv->kobj = kobj_alloc_directory(drv->name);
 	kobj_add(search_class_driver_kobj(), drv->kobj);
@@ -89,7 +108,8 @@ uint8_t register_driver(struct driver_t * drv)
 	init_hlist_node(&drv->node);
 	hlist_add_head(&drv->node, driver_hash(drv->name));
 	spin_unlock_irq();//开中断
-
+	sprintf(Ibuf,"%s register driver success!",drv->name);
+	MK_LOG_INFO(Ibuf);
 	return TRUE;
 }
 
@@ -105,17 +125,27 @@ uint8_t register_driver(struct driver_t * drv)
 **********************************************************************/
 uint8_t unregister_driver(struct driver_t * drv)
 {
+	char Ibuf[128];
 	if(!drv || !drv->name)
+	 {
+		sprintf(Ibuf,"%s unregister driver fail!",drv->name);
+		MK_LOG_ERROR(Ibuf);
 		return FALSE;
+	 }
 
 	if(hlist_unhashed(&drv->node))
+	 {
+		sprintf(Ibuf,"%s unregister driver fail!",drv->name);
+		MK_LOG_ERROR(Ibuf);
 		return FALSE;
+	 }
 
 	spin_lock_irq();
 	hlist_del(&drv->node);
 	spin_unlock_irq();
 	kobj_remove_self(drv->kobj);
-
+	sprintf(Ibuf,"%s unregister driver success!",drv->name);
+	MK_LOG_INFO(Ibuf);
 	return TRUE;
 }
 

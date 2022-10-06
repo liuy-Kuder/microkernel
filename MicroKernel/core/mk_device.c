@@ -1,5 +1,18 @@
+/********************************************************************
+*
+*文件名称：mk_device.c
+*内容摘要：提供总线读写平台
+*当前版本：V1.0
+*作者：刘杨
+*完成时期：2022.09.12
+*其他说明: none
+*
+**********************************************************************/
+
 #include "microkernel.h"
 #include "mk_setup.h"
+#include "../log/mk_log.h"
+
 struct list_head __device_list;
 struct list_head __device_head[DEVICE_TYPE_MAX_COUNT];
 static struct hlist_head __device_hash[CONFIG_DEVICE_HASH_SIZE];
@@ -9,24 +22,6 @@ static struct hlist_head * device_hash(const char * name)
 	return &__device_hash[shash(name) % ARRAY_SIZE(__device_hash)];
 }
 
-/*
-static struct kobj_t * search_device_kobj(struct device_t * dev)
-{
-	struct kobj_t * kdevice;
-	char * name;
-
-	if(!dev || !dev->kobj)
-		return NULL;
-
-	name[dev->type];
-
-	kdevice = kobj_search_directory_with_create(kobj_get_root(), "device");
-	if(!kdevice)
-		return NULL;
-
-	return kobj_search_directory_with_create(kdevice, (const char *)name);
-}
-*/
 /********************************************************************
 *                      功能函数
 *功能描述： 搜索device下的name目录，没有就创建
@@ -192,6 +187,49 @@ static struct kobj_t * search_device_kobj(struct device_t * dev)
 
 /********************************************************************
 *                      功能函数
+*功能描述：设备挂起
+*输入参数：device_t
+*返回值：无
+*其他说明：无
+*修改日期       版本      修改人        修改内容
+*---------------------------------------------------------------------
+*2022.9.12      1.0       刘杨
+**********************************************************************/
+static void suspend_device(struct device_t * dev)
+{
+	char Ibuf[128];
+	if(dev)
+	{
+		if(dev->driver && dev->driver->suspend)
+			dev->driver->suspend(dev);
+		sprintf(Ibuf,"%s suspend device success!",dev->name);
+		MK_LOG_INFO(Ibuf);
+	}
+}
+
+/********************************************************************
+*                      功能函数
+*功能描述：设备恢复
+*输入参数：device_t
+*返回值：无
+*其他说明：无
+*修改日期       版本      修改人        修改内容
+*---------------------------------------------------------------------
+*2022.9.12      1.0       刘杨
+**********************************************************************/
+static void resume_device(struct device_t * dev)
+{
+	char Ibuf[128];
+	if(dev)
+	 {
+		if(dev->driver && dev->driver->resume)
+			dev->driver->resume(dev);
+		sprintf(Ibuf,"%s resume device success!",dev->name);
+		MK_LOG_INFO(Ibuf);
+	 }
+}
+/********************************************************************
+*                      功能函数
 *功能描述： 驱动写暂停
 *输入参数：
 *		kobj：对象
@@ -294,14 +332,13 @@ char * alloc_device_name(const char * name, int id)
 **********************************************************************/
 int free_device_name(char * name)
 {
-	int ret = 0;
 	if(name)
 	 {
-		free(name);
-		return MK_OK;
+		MK_FREE(name);
+		return FALSE;
 	 }
 	else
-	 return MK_ERROR;
+	 return TRUE;
 }
 
 /********************************************************************
@@ -352,6 +389,50 @@ struct device_t * search_first_device(enum device_type_t type)
 
 /********************************************************************
 *                      功能函数
+*功能描述：device数量累加
+*输入参数：无
+*返回值：无
+*其他说明：无
+*修改日期       版本      修改人        修改内容
+*---------------------------------------------------------------------
+*2022.10.6     1.0        刘杨
+**********************************************************************/
+static uint16_t cnt = 0;
+static void DeviceIncrease(void)
+{
+	cnt++;
+}
+
+/********************************************************************
+*                      功能函数
+*功能描述：device数量减少
+*输入参数：无
+*返回值：无
+*其他说明：无
+*修改日期       版本      修改人        修改内容
+*---------------------------------------------------------------------
+*2022.10.6     1.0        刘杨
+**********************************************************************/
+static void DeviceDecrease(void)
+{
+	cnt--;
+}
+/********************************************************************
+*                      功能函数
+*功能描述：获得device的数量
+*输入参数：无
+*返回值：device数量
+*其他说明：无
+*修改日期       版本      修改人        修改内容
+*---------------------------------------------------------------------
+*2022.10.6     1.0        刘杨
+**********************************************************************/
+uint16_t GetDeviceNum(void)
+{
+	return cnt;
+}
+/********************************************************************
+*                      功能函数
 *功能描述：注册设备
 *输入参数：device_t
 *返回值：成功返回true,失败返回false
@@ -362,19 +443,31 @@ struct device_t * search_first_device(enum device_type_t type)
 **********************************************************************/
 uint8_t register_device(struct device_t * dev)
 {
+	char Ibuf[128];
 	if(!dev || !dev->name)
+	 {
+		sprintf(Ibuf,"%s register device fail!",dev->name);
+		MK_LOG_ERROR(Ibuf);
 		return FALSE;
+	 }
 		
     if(dev->type >= ARRAY_SIZE(__device_head))
+	 {
+		sprintf(Ibuf,"%s register device fail!",dev->name);
+		MK_LOG_ERROR(Ibuf);
 		return FALSE;
+	 }
 
 	if(device_exist(dev->name))
+	 {
+		sprintf(Ibuf,"%s register device fail!",dev->name);
+		MK_LOG_ERROR(Ibuf);
 		return FALSE;
+	 }
 
 	kobj_add_regular(dev->kobj, "suspend", NULL, device_write_suspend,NULL, dev);
 	kobj_add_regular(dev->kobj, "resume", NULL, device_write_resume,NULL, dev);
 	kobj_add(search_device_kobj(dev), dev->kobj);
-
 	spin_lock_irq();
 	init_list_head(&dev->list);
 	list_add_tail(&dev->list, &__device_list);
@@ -383,7 +476,9 @@ uint8_t register_device(struct device_t * dev)
 	init_hlist_node(&dev->node);
 	hlist_add_head(&dev->node, device_hash(dev->name));
 	spin_unlock_irq();
-
+	sprintf(Ibuf,"%s device install success!",dev->name);
+	MK_LOG_INFO(Ibuf);
+	DeviceIncrease();
 	return TRUE;
 }
 
@@ -399,23 +494,37 @@ uint8_t register_device(struct device_t * dev)
 **********************************************************************/
 uint8_t unregister_device(struct device_t * dev)
 {
+	char Ibuf[128];
 	if(!dev || !dev->name)
+	 {
+		sprintf(Ibuf,"%s unregister device fail!",dev->name);
+		MK_LOG_ERROR(Ibuf);
 		return FALSE;
+	 }
 
     if(dev->type >= ARRAY_SIZE(__device_head))
+	 {
+		sprintf(Ibuf,"%s unregister device fail!",dev->name);
+		MK_LOG_ERROR(Ibuf);
 		return FALSE;
+	 }
 
 	if(hlist_unhashed(&dev->node))
+	 {
+		sprintf(Ibuf,"%s unregister device fail!",dev->name);
+		MK_LOG_ERROR(Ibuf);
 		return FALSE;
+	 }
 
-	//notifier_chain_call(&__device_nc, "notifier-device-remove", dev);
 	spin_lock_irq();
 	list_del(&dev->list);
 	list_del(&dev->head);
 	hlist_del(&dev->node);
 	spin_unlock_irq();
 	kobj_remove(search_device_kobj(dev), dev->kobj);
-
+	sprintf(Ibuf,"%s unregister device success!",dev->name);
+	MK_LOG_INFO(Ibuf);
+	DeviceDecrease();
 	return TRUE;
 }
 
@@ -433,46 +542,6 @@ void remove_device(struct device_t * dev)
 {
 	if(dev && dev->driver && dev->driver->remove)
 		dev->driver->remove(dev);
-}
-/********************************************************************
-*                      功能函数
-*功能描述：设备挂起
-*输入参数：device_t
-*返回值：无
-*其他说明：无
-*修改日期       版本      修改人        修改内容
-*---------------------------------------------------------------------
-*2022.9.12      1.0       刘杨
-**********************************************************************/
-void suspend_device(struct device_t * dev)
-{
-	if(dev)
-	{
-		//notifier_chain_call(&__device_nc, "notifier-device-suspend", dev);
-		if(dev->driver && dev->driver->suspend)
-			dev->driver->suspend(dev);
-	}
-}
-
-/********************************************************************
-*                      功能函数
-*功能描述：设备恢复
-*输入参数：device_t
-*返回值：无
-*其他说明：无
-*修改日期       版本      修改人        修改内容
-*---------------------------------------------------------------------
-*2022.9.12      1.0       刘杨
-**********************************************************************/
-void resume_device(struct device_t * dev)
-{
-	if(dev)
-	{
-		if(dev->driver && dev->driver->resume)
-			dev->driver->resume(dev);
-		//LOG日志
-		///notifier_chain_call(&__device_nc, "notifier-device-resume", dev);
-	}
 }
 
 /********************************************************************

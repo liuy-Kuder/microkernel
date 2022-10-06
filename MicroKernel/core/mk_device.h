@@ -1,11 +1,9 @@
-#ifndef __MK_DEVICE_H__
-#define __MK_DEVICE_H__
+#ifndef __MK_DEVICE_H_
+#define __MK_DEVICE_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "microkernel.h"
 
 enum device_type_t {
 	DEVICE_TYPE_ADC				= 0,
@@ -70,6 +68,18 @@ struct device_t
 	void * priv;
 };
 
+struct device_info_t{
+	char * device_name;
+	char * node_name;
+	char * attribute;
+};
+
+struct register_info_t{
+	char * driver_name;
+	uint8_t device_num;
+	void * device_private;
+};
+
 extern struct list_head __device_list;
 extern struct list_head __device_head[DEVICE_TYPE_MAX_COUNT];
 
@@ -77,11 +87,10 @@ char * alloc_device_name(const char * name, int id);
 int free_device_name(char * name);
 struct device_t * search_device(const char * name, enum device_type_t type);
 struct device_t * search_first_device(enum device_type_t type);
+uint16_t GetDeviceNum(void);
 uint8_t register_device(struct device_t * dev);
 uint8_t unregister_device(struct device_t * dev);
 void remove_device(struct device_t * dev);
-void suspend_device(struct device_t * dev);
-void resume_device(struct device_t * dev);
 void device_pure_init(void);
 #ifdef __cplusplus
 }

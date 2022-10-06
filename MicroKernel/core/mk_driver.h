@@ -1,5 +1,5 @@
-#ifndef __MK_DRIVER_H__
-#define __MK_DRIVER_H__
+#ifndef __MK_DRIVER_H_
+#define __MK_DRIVER_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -10,7 +10,7 @@ extern "C" {
 struct device_t;
 
 struct driver_info_t{
-	uint8_t* drv_name;//设备名称
+	char* drv_name;//设备名称
 	uint8_t drv_num;//设备数量
 	void * drv_private;//私有变量
 };

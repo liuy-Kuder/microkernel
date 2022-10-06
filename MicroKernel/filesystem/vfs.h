@@ -8,17 +8,17 @@ extern "C" {
 #include "microkernel.h"
 #include "sysfs.h"
 #include <stdint.h>
-
+#include "rtos.h"
 
 #define VFS_MAX_PATH		(1024)//绝对路径的最大字符
-#define	VFS_MAX_NAME		(256)
-#define VFS_MAX_FD			(256)
-#define VFS_NODE_HASH_SIZE	(256)
+#define	VFS_MAX_NAME		(64)
+#define VFS_MAX_FD			(32)
+#define VFS_NODE_HASH_SIZE	(32)
 
 #define O_RDONLY			(1 << 0)//只读
 #define O_WRONLY			(1 << 1)//只写
 #define O_CTLONLY			(1 << 2)//控制
-#define O_RDWR				(O_RDONLY | O_WRONLY|O_CTLONLY)//读写
+#define O_RDWR				(O_RDONLY | O_WRONLY | O_CTLONLY)//读写
 #define O_ACCMODE			(O_RDWR)//全模式
 
 #define O_CREAT				(1 << 8)
@@ -127,7 +127,10 @@ struct vfs_node_t {
 	char v_path[VFS_MAX_PATH];
 	enum vfs_node_flag_t v_flags;
 	enum vfs_node_type_t v_type;
-
+#ifdef USE_FREERTOS
+	SemaphoreHandle_t v_lock;
+//#elif USER_THREADX
+#endif
 	uint32_t v_mode;
 	int64_t v_size;
 	void * v_data;
@@ -142,13 +145,14 @@ enum {
 struct vfs_mount_t {
 	struct list_head m_link;
 	struct filesystem_t * m_fs;
-	void * m_dev;
 	char m_path[VFS_MAX_PATH];
 	uint32_t m_flags;
-	//atomic_t m_refcnt;
 	struct vfs_node_t * m_root;
 	struct vfs_node_t * m_covered;
-	//struct mutex_t m_lock;
+#ifdef USE_FREERTOS
+	SemaphoreHandle_t m_lock;
+//#elif USER_THREADX
+#endif
 	void * m_data;
 };
 
@@ -163,21 +167,6 @@ struct filesystem_t {
 	uint64_t (*ioctl)(struct vfs_node_t *, uint16_t, void *);
 	int (*readdir)(struct vfs_node_t *, int64_t, struct vfs_dirent_t *);
 	int (*lookup)(struct vfs_node_t *, const char *, struct vfs_node_t *);
-
-#if 1
-	int (*msync)(struct vfs_mount_t *);
-	int (*vget)(struct vfs_mount_t *, struct vfs_node_t *);
-	int (*vput)(struct vfs_mount_t *, struct vfs_node_t *);
-
-	int (*truncate)(struct vfs_node_t *, int64_t);
-	int (*sync)(struct vfs_node_t *);
-	int (*create)(struct vfs_node_t *, const char *, uint32_t);
-	int (*remove)(struct vfs_node_t *, struct vfs_node_t *, const char *);
-	int (*rename)(struct vfs_node_t *, const char *, struct vfs_node_t *, struct vfs_node_t *, const char *);
-	int (*mkdir)(struct vfs_node_t *, const char *, uint32_t);
-	int (*rmdir)(struct vfs_node_t *, struct vfs_node_t *, const char *);
-	int (*chmod)(struct vfs_node_t *, uint32_t);
-#endif
 };
 
 extern struct list_head __filesystem_list;
@@ -189,7 +178,6 @@ uint8_t unregister_filesystem(struct filesystem_t * fs);
 void vfs_force_unmount(struct vfs_mount_t * m);
 int vfs_mount(const char * dev, const char * dir, const char * fsname, uint32_t flags);
 int vfs_unmount(const char * path);
-int vfs_sync(void);
 struct vfs_mount_t * vfs_mount_get(int index);
 int vfs_mount_count(void);
 int vfs_open(const char * path, uint32_t flags);
@@ -198,19 +186,13 @@ uint64_t vfs_read(int fd, void * buf, uint64_t len);
 uint64_t vfs_write(int fd, void * buf, uint64_t len);
 uint64_t vfs_ioctl(int fd, uint64_t cmd, void * buf);
 int64_t vfs_lseek(int fd, int64_t off, int whence);
-int vfs_fsync(int fd);
-int vfs_fchmod(int fd, uint32_t mode);
 int vfs_fstat(int fd, struct vfs_stat_t * st);
 int vfs_opendir(const char * name);
 int vfs_closedir(int fd);
 int vfs_readdir(int fd, struct vfs_dirent_t * dir);
 int vfs_rewinddir(int fd);
-int vfs_mkdir(const char * path, uint32_t mode);
-int vfs_rmdir(const char * path);
-int vfs_rename(const char * src, const char * dst);
 int vfs_unlink(const char * path);
 int vfs_access(const char * path, uint32_t mode);
-int vfs_chmod(const char * path, uint32_t mode);
 int vfs_stat(const char * path, struct vfs_stat_t * st);
 
 void do_init_vfs(void);

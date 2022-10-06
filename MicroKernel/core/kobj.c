@@ -8,6 +8,8 @@
 *其他说明: none
 *
 **********************************************************************/
+#include <stdlib.h>
+#include <string.h>
 #include "microkernel.h"
 
 static struct kobj_t * __kobj_root = NULL;
@@ -36,7 +38,7 @@ static struct kobj_t * __kobj_alloc(const char * name, enum kobj_type_t type,\
 	if(!name)
 		return NULL;//名称不为空
 
-	kobj = malloc(sizeof(struct kobj_t));//分配字节内存
+	kobj = MK_MALLOC(sizeof(struct kobj_t));//malloc(sizeof(struct kobj_t));//分配字节内存
 	if(!kobj)
 		return NULL;//分配失败
 
@@ -199,9 +201,8 @@ uint8_t kobj_free(struct kobj_t * kobj)
 {
 	if(!kobj)
 		return FALSE;
-
-	free(kobj->name);
-	free(kobj);
+	MK_FREE(kobj->name);
+	MK_FREE(kobj);
 	return TRUE;
 }
 
@@ -264,17 +265,17 @@ uint8_t kobj_remove(struct kobj_t * parent, struct kobj_t * kobj)
 	if(!kobj)
 		return FALSE;
 
-	list_for_each_entry_safe(pos, n,struct kobj_t, &(parent->children), entry)
-	{
+	list_for_each_entry_safe(pos, n, struct kobj_t, &(parent->children), entry)
+	 {
 		if(pos == kobj)
-		{
+		 {
 			spin_lock_irq();
 			pos->parent = pos;
 			list_del(&(pos->entry));
 			spin_unlock_irq();
 			return TRUE;
-		}
-	}
+		 }
+	 }
 
 	return FALSE;
 }
@@ -403,7 +404,7 @@ uint8_t kobj_remove_self(struct kobj_t * kobj)
 
 /********************************************************************
 *                      功能函数
-*功能描述：分配hash值
+*功能描述：根据字符串动态分配hash值
 *输入参数：字符串
 *返回值：返回value
 *其他说明：无
