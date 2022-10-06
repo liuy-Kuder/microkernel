@@ -271,8 +271,7 @@ static int vfs_node_stat(struct vfs_node_t * n, struct vfs_stat_t * st)
 
 	st->st_ino = (uint64_t)((unsigned long)n);
 	mutex_lock(n->v_lock);
-	st->st_size = n->v_size;
-	mode = n->v_mode & (S_IRWXU | S_IRWXG | S_IRWXO);
+	mode = n->v_mode & S_IRWXU;
 	mutex_unlock(n->v_lock);
 	switch(n->v_type)
 	{
@@ -304,9 +303,6 @@ static int vfs_node_stat(struct vfs_node_t * n, struct vfs_stat_t * st)
 
 	if(n->v_type == VNT_CHR || n->v_type == VNT_BLK)
 		st->st_dev = (uint64_t)((unsigned long)n->v_data);
-	st->st_uid = 0;
-	st->st_gid = 0;
-
 	return 0;
 }
 
@@ -318,7 +314,7 @@ static int vfs_node_access(struct vfs_node_t * n, uint32_t mode)
 	m = n->v_mode;
 	mutex_unlock(n->v_lock);
 
-	if((mode & R_OK) && !(m & (S_IRUSR | S_IRGRP | S_IROTH)))
+	if((mode & R_OK) && !(m & S_IRUSR))
 		return -1;
 
 	if(mode & W_OK)
@@ -326,11 +322,11 @@ static int vfs_node_access(struct vfs_node_t * n, uint32_t mode)
 		if(n->v_mount->m_flags & MOUNT_RO)
 			return -1;
 
-		if(!(m & (S_IWUSR | S_IWGRP | S_IWOTH)))
+		if(!(m & S_IWUSR))
 			return -1;
 	}
 
-	if((mode & X_OK) && !(m & (S_IXUSR | S_IXGRP | S_IXOTH)))
+	if((mode & X_OK) && !(m & S_IXUSR))
 		return -1;
 
 	return 0;
@@ -581,7 +577,7 @@ int vfs_mount(const char * dev, const char * dir, const char * fsname, uint32_t 
 	}
 	n->v_type = VNT_DIR;
 	n->v_flags = VNF_ROOT;
-	n->v_mode = S_IFDIR | S_IRWXU | S_IRWXG | S_IRWXO;
+	n->v_mode = S_IFDIR | S_IRWXU;
 	m->m_root = n;
 
 	mutex_lock(m->m_lock);
@@ -597,7 +593,7 @@ int vfs_mount(const char * dev, const char * dir, const char * fsname, uint32_t 
 	 }
 
 	if(m->m_flags & MOUNT_RO)
-		m->m_root->v_mode &= ~(S_IWUSR|S_IWGRP|S_IWOTH);
+		m->m_root->v_mode &= ~S_IWUSR;
 
 	mutex_lock(mnt_list_lock);
 	list_for_each_entry(tm, struct vfs_mount_t, &mnt_list, m_link)
@@ -856,7 +852,7 @@ int32_t vfs_read(int fd, void * buf, uint32_t len)
 
 	mutex_lock(n->v_lock);
 	//ret = n->v_mount->m_fs->read(n, f->f_offset, buf, len);
-	ret = n->v_mount->m_fs->read(n, 0, buf, len);
+	ret = n->v_mount->m_fs->read(n, buf, len);
 	mutex_unlock(n->v_lock);
 
 	//f->f_offset += ret;
@@ -909,7 +905,7 @@ int32_t vfs_write(int fd, void * buf, uint32_t len)
 
 	mutex_lock(n->v_lock);
 	//ret = n->v_mount->m_fs->write(n, f->f_offset, buf, len);
-	ret = n->v_mount->m_fs->write(n, 0, buf, len);
+	ret = n->v_mount->m_fs->write(n, buf, len);
 	mutex_unlock(n->v_lock);
 
 	//f->f_offset += ret;
@@ -958,68 +954,6 @@ int16_t vfs_ioctl(int fd, uint64_t cmd, void * buf)
 	mutex_unlock(f->f_lock);
 
 	return err;
-}
-
-int64_t vfs_lseek(int fd, int64_t off, int whence)
-{
-	struct vfs_node_t * n;
-	struct vfs_file_t * f;
-	int64_t ret;
-
-	f = vfs_fd_to_file(fd);
-	if(!f)
-		return 0;
-
-	mutex_lock(f->f_lock);
-	n = f->f_node;
-	if(!n)
-	{
-		mutex_unlock(f->f_lock);
-		return 0;
-	}
-
-	mutex_lock(n->v_lock);
-	switch(whence)
-	{
-	case VFS_SEEK_SET:
-		if(off < 0)
-			off = 0;
-		else if(off > (signed long long)n->v_size)
-			off = n->v_size;
-		break;
-
-	case VFS_SEEK_CUR:
-		if((f->f_offset + off) > (signed long long)n->v_size)
-			off = n->v_size;
-		else if((f->f_offset + off) < 0)
-			off = 0;
-		else
-			off = f->f_offset + off;
-		break;
-
-	case VFS_SEEK_END:
-		if(off > 0)
-			off = n->v_size;
-		else if((n->v_size + off) < 0)
-			off = 0;
-		else
-			off = n->v_size + off;
-		break;
-
-	default:
-		mutex_unlock(n->v_lock);
-		ret = f->f_offset;
-		mutex_unlock(f->f_lock);
-		return ret;
-	}
-
-	if(off <= n->v_size)
-		f->f_offset = off;
-	mutex_unlock(n->v_lock);
-	ret = f->f_offset;
-	mutex_unlock(f->f_lock);
-
-	return ret;
 }
 
 int vfs_fstat(int fd, struct vfs_stat_t * st)
@@ -1243,6 +1177,7 @@ int vfs_unlink(const char * path)
 	return err;
 }
 
+//文件访问权限
 int vfs_access(const char * path, uint32_t mode)
 {
 	struct vfs_node_t * n;

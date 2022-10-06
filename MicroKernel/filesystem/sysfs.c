@@ -64,20 +64,18 @@ static int sys_unmount(struct vfs_mount_t * m)
 *---------------------------------------------------------------------
 *2022.10.03     1.0        刘杨
 **********************************************************************/
-static uint64_t sys_read(struct vfs_node_t * n, int64_t off, void * buf, uint64_t len)
+static int32_t sys_read(struct vfs_node_t * n, void * buf, uint64_t len)
 {
 	struct kobj_t * kobj;
 
 	if(n->v_type != VNT_REG)
-		return 0;
+		return -1;
 
 	kobj = n->v_data;
-	if(off == 0)
-	{
-		if(kobj && kobj->read)
-			return kobj->read(kobj, buf, len);
-	}
-	return 0;
+	if(kobj && kobj->read)
+	  return kobj->read(kobj, buf, len);
+
+	return -1;
 }
 
 /********************************************************************
@@ -93,20 +91,16 @@ static uint64_t sys_read(struct vfs_node_t * n, int64_t off, void * buf, uint64_
 *---------------------------------------------------------------------
 *2022.10.03     1.0        刘杨
 **********************************************************************/
-static uint64_t sys_write(struct vfs_node_t * n, int64_t off, void * buf, uint64_t len)
+static int32_t sys_write(struct vfs_node_t * n, void * buf, uint64_t len)
 {
 	struct kobj_t * kobj;
 
 	if(n->v_type != VNT_REG)
-		return 0;
-
+		return -1;
 	kobj = n->v_data;
-	if(off == 0)
-	{
-		if(kobj && kobj->write)
-			return kobj->write(kobj, buf, len);
-	}
-	return 0;
+	if(kobj && kobj->write)
+	  return kobj->write(kobj, buf, len);
+	return -1;
 }
 
 /********************************************************************
@@ -121,19 +115,16 @@ static uint64_t sys_write(struct vfs_node_t * n, int64_t off, void * buf, uint64
 *---------------------------------------------------------------------
 *2022.10.03     1.0        刘杨
 **********************************************************************/
-static uint64_t sys_ioctl(struct vfs_node_t * n, uint16_t cmd, void * buf)
+static int16_t sys_ioctl(struct vfs_node_t * n, uint16_t cmd, void * buf)
 {
 	struct kobj_t * kobj;
 
 	if(n->v_type != VNT_REG)
-		return 0;
-
+	  return -1;
 	kobj = n->v_data;
-
 	if(kobj && kobj->ioctl)
-		return kobj->ioctl(kobj, cmd, buf);
-		
-	return 0;
+	  return kobj->ioctl(kobj, cmd, buf);
+	return -1;
 }
 
 /********************************************************************
@@ -202,25 +193,24 @@ static int sys_lookup(struct vfs_node_t * dn, const char * name, struct vfs_node
 		return -1;
     
 	n->v_mode = 0;
-	n->v_size = 0;
 	n->v_data = (void *)obj;
 
 	if(obj->type == KOBJ_TYPE_DIR)
 	{
 		n->v_type = VNT_DIR;
 		n->v_mode |= S_IFDIR;
-		n->v_mode |= S_IRWXU | S_IRWXG | S_IRWXO;
+		n->v_mode |= S_IRWXU;
 	}
 	else
 	{
 		n->v_type = VNT_REG;
 		n->v_mode |= S_IFREG;
 		if(obj->read)
-			n->v_mode |= (S_IRUSR | S_IRGRP | S_IROTH);
+			n->v_mode |= S_IRUSR;
 		if(obj->write)
-			n->v_mode |= (S_IWUSR | S_IWGRP | S_IWOTH);
+			n->v_mode |= S_IWUSR;
 		if(obj->ioctl)
-			n->v_mode |= (S_IWUSR | S_IWGRP | S_IWOTH);
+			n->v_mode |= S_IWUSR;
 	}
 	return 0;
 }

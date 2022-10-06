@@ -21,37 +21,18 @@ extern "C" {
 #define O_RDWR				(O_RDONLY | O_WRONLY | O_CTLONLY)//读写
 #define O_ACCMODE			(O_RDWR)//全模式
 
-#define O_CREAT				(1 << 8)
-#define O_EXCL				(1 << 9)
-#define O_NOCTTY			(1 << 10)
-#define O_TRUNC				(1 << 11)
-#define O_APPEND			(1 << 12)
-#define O_DSYNC				(1 << 13)
-#define O_NONBLOCK			(1 << 14)
-#define O_SYNC				(1 << 15)
-
-#define S_IXOTH				(1 << 0)
-#define S_IWOTH				(1 << 1)
-#define S_IROTH				(1 << 2)
-#define S_IRWXO				(S_IROTH | S_IWOTH | S_IXOTH)
-
-#define S_IXGRP				(1 << 3)
-#define S_IWGRP				(1 << 4)
-#define S_IRGRP				(1 << 5)
-#define S_IRWXG				(S_IRGRP | S_IWGRP | S_IXGRP)
-
-#define S_IXUSR				(1 << 6)
-#define S_IWUSR				(1 << 7)
-#define S_IRUSR				(1 << 8)
+#define S_IXUSR				(1 << 0) //所有者拥有执行权限
+#define S_IWUSR				(1 << 1) //所有者拥有写权限
+#define S_IRUSR				(1 << 2) //所有者拥有读权限
 #define S_IRWXU				(S_IRUSR | S_IWUSR | S_IXUSR)
 
-#define	S_IFDIR				(1 << 16)
-#define	S_IFCHR				(1 << 17)
-#define	S_IFBLK				(1 << 18)
-#define	S_IFREG				(1 << 19)
-#define	S_IFLNK				(1 << 20)
-#define	S_IFIFO				(1 << 21)
-#define	S_IFSOCK			(1 << 22)
+#define	S_IFDIR				(1 << 3)
+#define	S_IFCHR				(1 << 4)
+#define	S_IFBLK				(1 << 5)
+#define	S_IFREG				(1 << 6)
+#define	S_IFLNK				(1 << 7)
+#define	S_IFIFO				(1 << 8)
+#define	S_IFSOCK			(1 << 9)
 #define	S_IFMT				(S_IFDIR | S_IFCHR | S_IFBLK | S_IFREG | S_IFLNK | S_IFIFO | S_IFSOCK)
 
 #define S_ISDIR(m)			((m) & S_IFDIR )
@@ -62,14 +43,10 @@ extern "C" {
 #define S_ISFIFO(m)			((m) & S_IFIFO )
 #define S_ISSOCK(m)			((m) & S_IFSOCK )
 
-#define	C_OK				(1 << 3)
-#define	R_OK				(1 << 2)
-#define	W_OK				(1 << 1)
-#define	X_OK				(1 << 0)
-
-#define VFS_SEEK_SET		(0)
-#define VFS_SEEK_CUR		(1)
-#define VFS_SEEK_END		(2)
+#define	C_OK				(1 << 3) //是否具有控制权限
+#define	R_OK				(1 << 2) //是否具有读权限
+#define	W_OK				(1 << 1) //是否具有可写权限
+#define	X_OK				(1 << 0) //是否具有可执行权限
 
 struct vfs_stat_t;
 struct vfs_dirent_t;
@@ -79,11 +56,8 @@ struct filesystem_t;
 
 struct vfs_stat_t {
 	uint64_t st_ino;
-	int64_t st_size;
 	uint32_t st_mode;
 	uint64_t st_dev;
-	uint32_t st_uid;
-	uint32_t st_gid;
 };
 
 enum vfs_dirent_type_t {
@@ -131,8 +105,7 @@ struct vfs_node_t {
 	SemaphoreHandle_t v_lock;
 //#elif USER_THREADX
 #endif
-	uint32_t v_mode;
-	int64_t v_size;
+	uint16_t v_mode;
 	void * v_data;
 };
 
@@ -162,9 +135,9 @@ struct filesystem_t {
 	const char * name;
     int (*mount)(struct vfs_mount_t *, const char *);
 	int (*unmount)(struct vfs_mount_t *);
-    uint64_t (*read)(struct vfs_node_t *, int64_t, void *, uint64_t);
-	uint64_t (*write)(struct vfs_node_t *, int64_t, void *, uint64_t);
-	uint64_t (*ioctl)(struct vfs_node_t *, uint16_t, void *);
+    int32_t (*read)(struct vfs_node_t *, void *, uint64_t);
+	int32_t (*write)(struct vfs_node_t *, void *, uint64_t);
+	int16_t (*ioctl)(struct vfs_node_t *, uint16_t, void *);
 	int (*readdir)(struct vfs_node_t *, int64_t, struct vfs_dirent_t *);
 	int (*lookup)(struct vfs_node_t *, const char *, struct vfs_node_t *);
 };
@@ -185,7 +158,6 @@ int vfs_close(int fd);
 int32_t vfs_read(int fd, void * buf, uint32_t len);
 int32_t vfs_write(int fd, void * buf, uint32_t len);
 int16_t vfs_ioctl(int fd, uint64_t cmd, void * buf);
-int64_t vfs_lseek(int fd, int64_t off, int whence);
 int vfs_fstat(int fd, struct vfs_stat_t * st);
 int vfs_opendir(const char * name);
 int vfs_closedir(int fd);
