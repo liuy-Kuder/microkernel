@@ -813,36 +813,45 @@ int vfs_close(int fd)
 	return 0;
 }
 //文件节点的读取
-uint64_t vfs_read(int fd, void * buf, uint64_t len)
+int32_t vfs_read(int fd, void * buf, uint32_t len)
 {
 	struct vfs_node_t * n;
 	struct vfs_file_t * f;
-	uint64_t ret;
+	int32_t ret;
 
 	if(!buf || !len)
-		return 0;
+	 {
+		ret = -1;
+		return ret;
+	 }
 
 	f = vfs_fd_to_file(fd);
 	if(!f)
-		return 0;
+	 {
+		ret = -1;
+		return ret;
+	 }
 
 	mutex_lock(f->f_lock);
 	n = f->f_node;
 	if(!n)
 	{
 		mutex_unlock(f->f_lock);
-		return 0;
+		ret = -1;
+		return ret;
 	}
 	if(n->v_type != VNT_REG)
 	{
 		mutex_unlock(f->f_lock);
-		return 0;
+		ret = -1;
+		return ret;
 	}
 
 	if(!(f->f_flags & O_RDONLY))
 	{
 		mutex_unlock(f->f_lock);
-		return 0;
+		ret = -1;
+		return ret;
 	}
 
 	mutex_lock(n->v_lock);
@@ -857,36 +866,45 @@ uint64_t vfs_read(int fd, void * buf, uint64_t len)
 }
 
 //文件节点的写入
-uint64_t vfs_write(int fd, void * buf, uint64_t len)
+int32_t vfs_write(int fd, void * buf, uint32_t len)
 {
 	struct vfs_node_t * n;
 	struct vfs_file_t * f;
-	uint64_t ret;
+	int32_t ret = 0;
 
 	if(!buf || !len)
-		return 0;
+	 {
+		ret = -1;
+		return ret;
+	 }
 
 	f = vfs_fd_to_file(fd);
 	if(!f)
-		return 0;
+	 {
+		ret = -1;
+		return ret;
+	 }
 
 	mutex_lock(f->f_lock);
 	n = f->f_node;
 	if(!n)
 	 {
 		mutex_unlock(f->f_lock);
-		return 0;
+		ret = -1;
+		return ret;
 	 }
 	if(n->v_type != VNT_REG)
 	 {
 		mutex_unlock(f->f_lock);
-		return 0;
+		ret = -1;
+		return ret;
 	 }
 
 	if(!(f->f_flags & O_WRONLY))
 	 {
 		mutex_unlock(f->f_lock);
-		return 0;
+		ret = -1;
+		return ret;
 	 }
 
 	mutex_lock(n->v_lock);
@@ -900,41 +918,46 @@ uint64_t vfs_write(int fd, void * buf, uint64_t len)
 }
 
 //文件节点的读取
-uint64_t vfs_ioctl(int fd, uint64_t cmd, void * buf)
+int16_t vfs_ioctl(int fd, uint64_t cmd, void * buf)
 {
 	struct vfs_node_t * n;
 	struct vfs_file_t * f;
-	uint64_t ret;
-
+	int16_t err = 0;
 	f = vfs_fd_to_file(fd);
 	if(!f)
-		return 0;
-
+	 {
+		err = -1;
+		return err;
+	 }
+	
 	mutex_lock(f->f_lock);
 	n = f->f_node;
 	if(!n)
 	{
 		mutex_unlock(f->f_lock);
-		return 0;
+		err = -1;
+		return err;
 	}
 	if(n->v_type != VNT_REG)
 	{
 		mutex_unlock(f->f_lock);
-		return 0;
+		err = -1;
+		return err;
 	}
 
 	if(!(f->f_flags & O_CTLONLY))
 	{
 		mutex_unlock(f->f_lock);
-		return 0;
+		err = -1;
+		return err;
 	}
 
 	mutex_lock(n->v_lock);
-	ret = n->v_mount->m_fs->ioctl(n, cmd, buf);
+	err = n->v_mount->m_fs->ioctl(n, cmd, buf);
 	mutex_unlock(n->v_lock);
 	mutex_unlock(f->f_lock);
 
-	return ret;
+	return err;
 }
 
 int64_t vfs_lseek(int fd, int64_t off, int whence)
