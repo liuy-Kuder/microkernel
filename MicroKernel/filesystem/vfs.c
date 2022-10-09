@@ -73,7 +73,9 @@ uint8_t unregister_filesystem(struct filesystem_t * fs)
 struct vfs_file_t {
 #ifdef USE_FREERTOS
 	SemaphoreHandle_t f_lock;
-//#elif USER_THREADX
+#endif
+#ifdef USE_THREADX
+	TX_MUTEX f_lock;
 #endif
 	struct vfs_node_t * f_node;
 	int64_t f_offset;
@@ -85,7 +87,11 @@ struct vfs_file_t {
 	SemaphoreHandle_t fd_file_lock;
 	SemaphoreHandle_t node_list_lock[VFS_NODE_HASH_SIZE];
 #endif
-
+#ifdef USE_THREADX
+	TX_MUTEX mnt_list_lock;
+	TX_MUTEX fd_file_lock;
+	TX_MUTEX node_list_lock[VFS_NODE_HASH_SIZE];
+#endif
 static struct list_head mnt_list;
 static struct vfs_file_t fd_file[VFS_MAX_FD];
 struct list_head node_list[VFS_NODE_HASH_SIZE];
@@ -125,8 +131,9 @@ static int vfs_findroot(const char * path, struct vfs_mount_t ** mp, char ** roo
 
 	if(!path || !mp || !root)
 		return -1;
-
+#ifdef USE_OS
 	mutex_lock(mnt_list_lock);
+#endif
 	list_for_each_entry(pos,struct vfs_mount_t, &mnt_list, m_link)
 	{
 		len = count_match(path, pos->m_path);
@@ -136,8 +143,9 @@ static int vfs_findroot(const char * path, struct vfs_mount_t ** mp, char ** roo
 			m = pos;
 		}
 	}
+#ifdef USE_OS
 	mutex_unlock(mnt_list_lock);
-
+#endif
 	if(!m)
 		return -1;
 
@@ -213,7 +221,9 @@ static struct vfs_node_t * vfs_node_get(struct vfs_mount_t * m, const char * pat
 		return NULL;
 
 	init_list_head(&n->v_link);
+#ifdef USE_OS
 	mutex_init(n->v_lock);
+#endif
 	n->v_mount = m;
 	
     strncpy(n->v_path, path, sizeof(n->v_path));
@@ -223,9 +233,13 @@ static struct vfs_node_t * vfs_node_get(struct vfs_mount_t * m, const char * pat
 		return NULL;
 	}
 */
+#ifdef USE_OS
 	mutex_lock(node_list_lock[hash]);
+#endif
 	list_add(&n->v_link, &node_list[hash]);
+#ifdef USE_OS
 	mutex_unlock(node_list_lock[hash]);
+#endif
 	return n;
 }
 
@@ -234,8 +248,9 @@ static struct vfs_node_t * vfs_node_lookup(struct vfs_mount_t * m, const char * 
 	struct vfs_node_t * n;
 	uint32_t hash = vfs_node_hash(m, path);
 	int found = 0;
-
+#ifdef USE_OS
 	mutex_lock(node_list_lock[hash]);
+#endif
 	list_for_each_entry(n,struct vfs_node_t, &node_list[hash], v_link)
 	{
 		if((n->v_mount == m) && (!strncmp(n->v_path, path, VFS_MAX_PATH)))
@@ -244,8 +259,9 @@ static struct vfs_node_t * vfs_node_lookup(struct vfs_mount_t * m, const char * 
 			break;
 		}
 	}
+#ifdef USE_OS
 	mutex_unlock(node_list_lock[hash]);
-
+#endif
 	if(!found)
 		return NULL;
 
@@ -257,9 +273,13 @@ static void vfs_node_put(struct vfs_node_t * n)
 	uint32_t hash;
 	hash = vfs_node_hash(n->v_mount, n->v_path);
 	vfs_node_hash(n->v_mount, n->v_path);
+#ifdef USE_OS
 	mutex_lock(node_list_lock[hash]);
+#endif
 	list_del(&n->v_link);
+#ifdef USE_OS
 	mutex_unlock(node_list_lock[hash]);
+#endif
 	MK_FREE(n);
 }
 
@@ -270,9 +290,13 @@ static int vfs_node_stat(struct vfs_node_t * n, struct vfs_stat_t * st)
 	memset(st, 0, sizeof(struct vfs_stat_t));
 
 	st->st_ino = (uint64_t)((unsigned long)n);
+#ifdef USE_OS
 	mutex_lock(n->v_lock);
+#endif
 	mode = n->v_mode & S_IRWXU;
+#ifdef USE_OS
 	mutex_unlock(n->v_lock);
+#endif
 	switch(n->v_type)
 	{
 	case VNT_REG:
@@ -419,12 +443,15 @@ static int vfs_node_acquire(const char * path, struct vfs_node_t ** np)
 				vfs_node_put(dn);
 				return -1;
 			}
-
+#ifdef USE_OS
 			mutex_lock(n->v_lock);
 			mutex_lock(dn->v_lock);
+#endif
 			err = dn->v_mount->m_fs->lookup(dn, &node[j], n);
+#ifdef USE_OS
 			mutex_unlock(dn->v_lock);
 			mutex_unlock(n->v_lock);
+#endif
 			if(err || (*p == '/' && n->v_type != VNT_DIR))
 			{
 				vfs_node_release(n);
@@ -461,24 +488,32 @@ void vfs_force_unmount(struct vfs_mount_t * m)
 		vfs_force_unmount(tm);
 	}
 	list_del(&m->m_link);
-
+#ifdef USE_OS
 	mutex_lock(fd_file_lock);
+#endif
 	for(i = 0; i < VFS_MAX_FD; i++)
 	{
 		if(fd_file[i].f_node && (fd_file[i].f_node->v_mount == m))
 		{
+#ifdef USE_OS
 			mutex_lock(fd_file[i].f_lock);
+#endif
 			fd_file[i].f_node = NULL;
 			fd_file[i].f_offset = 0;
 			fd_file[i].f_flags = 0;
+#ifdef USE_OS
 			mutex_unlock(fd_file[i].f_lock);
+#endif
 		}
 	}
+#ifdef USE_OS
 	mutex_unlock(fd_file_lock);
-
+#endif
 	for(i = 0; i < VFS_NODE_HASH_SIZE; i++)
 	{
+#ifdef USE_OS
 		mutex_lock(node_list_lock[i]);
+#endif
 		while(1)
 		{
 			found = 0;
@@ -496,13 +531,17 @@ void vfs_force_unmount(struct vfs_mount_t * m)
 			list_del(&n->v_link);
 			MK_FREE(n);
 		}
+#ifdef USE_OS
 		mutex_unlock(node_list_lock[i]);
+#endif
 	}
-
+#ifdef USE_OS
 	mutex_lock(m->m_lock);
+#endif
 	m->m_fs->unmount(m);
+#ifdef USE_OS
 	mutex_unlock(m->m_lock);
-
+#endif
 	if(m->m_covered)
 		vfs_node_release(m->m_covered);
 	MK_FREE(m);
@@ -534,7 +573,9 @@ int vfs_mount(const char * dev, const char * dir, const char * fsname, uint32_t 
 	 }
 
 	init_list_head(&m->m_link);
+#ifdef USE_OS
 	mutex_init(m->m_lock);
+#endif
 	m->m_fs = fs;
 	m->m_flags = flags & MOUNT_MASK;
 
@@ -579,10 +620,13 @@ int vfs_mount(const char * dev, const char * dir, const char * fsname, uint32_t 
 	n->v_flags = VNF_ROOT;
 	n->v_mode = S_IFDIR | S_IRWXU;
 	m->m_root = n;
-
+#ifdef USE_OS
 	mutex_lock(m->m_lock);
+#endif
 	err = m->m_fs->mount(m, dev);
+#ifdef USE_OS
 	mutex_unlock(m->m_lock);
+#endif
 	if(err != 0)
 	 {
 		vfs_node_release(m->m_root);
@@ -594,16 +638,21 @@ int vfs_mount(const char * dev, const char * dir, const char * fsname, uint32_t 
 
 	if(m->m_flags & MOUNT_RO)
 		m->m_root->v_mode &= ~S_IWUSR;
-
+#ifdef USE_OS
 	mutex_lock(mnt_list_lock);
+#endif
 	list_for_each_entry(tm, struct vfs_mount_t, &mnt_list, m_link)
 	{
         if(!strcmp(tm->m_path, dir))
 		{
+#ifdef USE_OS
 			mutex_unlock(mnt_list_lock);
 			mutex_lock(m->m_lock);
+#endif
 			m->m_fs->unmount(m);
+#ifdef USE_OS
 			mutex_unlock(m->m_lock);
+#endif
 			vfs_node_release(m->m_root);
 			if(m->m_covered)
 			  vfs_node_release(m->m_covered);
@@ -612,8 +661,9 @@ int vfs_mount(const char * dev, const char * dir, const char * fsname, uint32_t 
 		}
     }
 	list_add(&m->m_link, &mnt_list);
+#ifdef USE_OS
 	mutex_unlock(mnt_list_lock);
-
+#endif
 	return 0;
 }
 
@@ -622,8 +672,9 @@ int vfs_unmount(const char * path)
 {
 	struct vfs_mount_t * m;
 	int found;
-
+#ifdef USE_OS
 	mutex_lock(mnt_list_lock);
+#endif
 	found = 0;
 	list_for_each_entry(m,struct vfs_mount_t, &mnt_list, m_link)
 	{
@@ -635,17 +686,21 @@ int vfs_unmount(const char * path)
 	}
 	if(!found)
 	 {
+#ifdef USE_OS
 		mutex_unlock(mnt_list_lock);
+#endif
 		return -1;
 	 }
 
 	list_del(&m->m_link);
+#ifdef USE_OS
 	mutex_unlock(mnt_list_lock);
-
 	mutex_lock(m->m_lock);
+#endif
 	m->m_fs->unmount(m);
+#ifdef USE_OS
 	mutex_unlock(m->m_lock);
-
+#endif
 	vfs_node_release(m->m_root);
 	if(m->m_covered)
 	  vfs_node_release(m->m_covered);
@@ -661,8 +716,9 @@ struct vfs_mount_t * vfs_mount_get(int index)
 
 	if(index < 0)
 		return NULL;
-
+#ifdef USE_OS
 	mutex_lock(mnt_list_lock);
+#endif
 	list_for_each_entry(m,struct vfs_mount_t, &mnt_list, m_link)
 	{
 		if(!index)
@@ -672,8 +728,9 @@ struct vfs_mount_t * vfs_mount_get(int index)
 		}
 		index--;
 	}
+#ifdef USE_OS
 	mutex_unlock(mnt_list_lock);
-
+#endif
 	if(!found)
 		return NULL;
 	return m;
@@ -684,14 +741,16 @@ int vfs_mount_count(void)
 {
 	struct vfs_mount_t * m;
 	uint8_t ret = 0;
-
+#ifdef USE_OS
 	mutex_lock(mnt_list_lock);
+#endif
 	list_for_each_entry(m, struct vfs_mount_t, &mnt_list, m_link)
 	{
 		ret++;
 	}
+#ifdef USE_OS
 	mutex_unlock(mnt_list_lock);
-
+#endif
 	return ret;
 }
 
@@ -774,13 +833,15 @@ int vfs_open(const char * path, uint32_t flags)
 		return -1;
 	}
 	f = vfs_fd_to_file(fd);
-
+#ifdef USE_OS
 	mutex_lock(f->f_lock);
+#endif
 	f->f_node = n;
 	f->f_offset = 0;
 	f->f_flags = flags;
+#ifdef USE_OS
 	mutex_unlock(f->f_lock);
-
+#endif
 	return fd;
 }
 
@@ -793,18 +854,22 @@ int vfs_close(int fd)
 	f = vfs_fd_to_file(fd);
 	if(!f)
 		return -1;
-
+#ifdef USE_OS
 	mutex_lock(f->f_lock);
+#endif
 	n = f->f_node;
 	if(!n)
 	{
+#ifdef USE_OS
 		mutex_unlock(f->f_lock);
+#endif
 		return -1;
 	}
 
 	vfs_node_release(n);
+#ifdef USE_OS
 	mutex_unlock(f->f_lock);
-
+#endif
 	vfs_fd_free(fd);
 	return 0;
 }
@@ -827,37 +892,43 @@ int32_t vfs_read(int fd, void * buf, uint32_t len)
 		ret = -1;
 		return ret;
 	 }
-
+#ifdef USE_OS
 	mutex_lock(f->f_lock);
+#endif
 	n = f->f_node;
 	if(!n)
 	{
+#ifdef USE_OS
 		mutex_unlock(f->f_lock);
+#endif
 		ret = -1;
 		return ret;
 	}
 	if(n->v_type != VNT_REG)
 	{
+#ifdef USE_OS
 		mutex_unlock(f->f_lock);
+#endif
 		ret = -1;
 		return ret;
 	}
 
 	if(!(f->f_flags & O_RDONLY))
 	{
+#ifdef USE_OS
 		mutex_unlock(f->f_lock);
+#endif
 		ret = -1;
 		return ret;
 	}
-
+#ifdef USE_OS
 	mutex_lock(n->v_lock);
-	//ret = n->v_mount->m_fs->read(n, f->f_offset, buf, len);
+#endif
 	ret = n->v_mount->m_fs->read(n, buf, len);
+#ifdef USE_OS
 	mutex_unlock(n->v_lock);
-
-	//f->f_offset += ret;
 	mutex_unlock(f->f_lock);
-
+#endif
 	return ret;
 }
 
@@ -880,36 +951,43 @@ int32_t vfs_write(int fd, void * buf, uint32_t len)
 		ret = -1;
 		return ret;
 	 }
-
+#ifdef USE_OS
 	mutex_lock(f->f_lock);
+#endif
 	n = f->f_node;
 	if(!n)
 	 {
+#ifdef USE_OS
 		mutex_unlock(f->f_lock);
+#endif
 		ret = -1;
 		return ret;
 	 }
 	if(n->v_type != VNT_REG)
 	 {
+#ifdef USE_OS
 		mutex_unlock(f->f_lock);
+#endif
 		ret = -1;
 		return ret;
 	 }
 
 	if(!(f->f_flags & O_WRONLY))
 	 {
+#ifdef USE_OS
 		mutex_unlock(f->f_lock);
+#endif
 		ret = -1;
 		return ret;
 	 }
-
+#ifdef USE_OS
 	mutex_lock(n->v_lock);
-	//ret = n->v_mount->m_fs->write(n, f->f_offset, buf, len);
+#endif
 	ret = n->v_mount->m_fs->write(n, buf, len);
+#ifdef USE_OS
 	mutex_unlock(n->v_lock);
-
-	//f->f_offset += ret;
 	mutex_unlock(f->f_lock);
+#endif
 	return ret;
 }
 
@@ -925,34 +1003,43 @@ int16_t vfs_ioctl(int fd, uint64_t cmd, void * buf)
 		err = -1;
 		return err;
 	 }
-	
+#ifdef USE_OS	
 	mutex_lock(f->f_lock);
+#endif
 	n = f->f_node;
 	if(!n)
 	{
+#ifdef USE_OS
 		mutex_unlock(f->f_lock);
+#endif
 		err = -1;
 		return err;
 	}
 	if(n->v_type != VNT_REG)
 	{
+#ifdef USE_OS
 		mutex_unlock(f->f_lock);
+#endif
 		err = -1;
 		return err;
 	}
 
 	if(!(f->f_flags & O_CTLONLY))
 	{
+#ifdef USE_OS
 		mutex_unlock(f->f_lock);
+#endif
 		err = -1;
 		return err;
 	}
-
+#ifdef USE_OS
 	mutex_lock(n->v_lock);
+#endif
 	err = n->v_mount->m_fs->ioctl(n, cmd, buf);
+#ifdef USE_OS
 	mutex_unlock(n->v_lock);
 	mutex_unlock(f->f_lock);
-
+#endif
 	return err;
 }
 
@@ -968,17 +1055,21 @@ int vfs_fstat(int fd, struct vfs_stat_t * st)
 	f = vfs_fd_to_file(fd);
 	if(!f)
 		return -1;
-
+#ifdef USE_OS
 	mutex_lock(f->f_lock);
+#endif
 	n = f->f_node;
 	if(!n)
 	{
+#ifdef USE_OS
 		mutex_unlock(f->f_lock);
+#endif
 		return -1;
 	}
 	err = vfs_node_stat(n, st);
+#ifdef USE_OS
 	mutex_unlock(f->f_lock);
-
+#endif
 	return err;
 }
 
@@ -998,23 +1089,29 @@ int vfs_opendir(const char * name)
 	f = vfs_fd_to_file(fd);
 	if(!f)
 		return -1;
-
+#ifdef USE_OS
 	mutex_lock(f->f_lock);
+#endif
 	n = f->f_node;
 	if(!n)
 	{
+#ifdef USE_OS
 		mutex_unlock(f->f_lock);
+#endif
 		return -1;
 	}
 
 	if(n->v_type != VNT_DIR)
 	{
+#ifdef USE_OS
 		mutex_unlock(f->f_lock);
+#endif
 		vfs_close(fd);
 		return -1;
 	}
+#ifdef USE_OS
 	mutex_unlock(f->f_lock);
-
+#endif
 	return fd;
 }
 //关闭一个目录
@@ -1026,22 +1123,28 @@ int vfs_closedir(int fd)
 	f = vfs_fd_to_file(fd);
 	if(!f)
 		return -1;
-
+#ifdef USE_OS
 	mutex_lock(f->f_lock);
+#endif
 	n = f->f_node;
 	if(!n)
 	{
+#ifdef USE_OS
 		mutex_unlock(f->f_lock);
+#endif
 		return -1;
 	}
 
 	if(n->v_type != VNT_DIR)
 	{
+#ifdef USE_OS
 		mutex_unlock(f->f_lock);
+#endif
 		return -1;
 	}
+#ifdef USE_OS
 	mutex_unlock(f->f_lock);
-
+#endif
 	return vfs_close(fd);
 }
 
@@ -1058,26 +1161,36 @@ int vfs_readdir(int fd, struct vfs_dirent_t * dir)
 	f = vfs_fd_to_file(fd);
 	if(!f)
 		return -1;
-
+#ifdef USE_OS
 	mutex_lock(f->f_lock);
+#endif
 	n = f->f_node;
 	if(!n)
 	{
+#ifdef USE_OS
 		mutex_unlock(f->f_lock);
+#endif
 		return -1;
 	}
 	if(n->v_type != VNT_DIR)
 	{
+#ifdef USE_OS
 		mutex_unlock(f->f_lock);
+#endif
 		return -1;
 	}
+#ifdef USE_OS
 	mutex_lock(n->v_lock);
+#endif
 	err = n->v_mount->m_fs->readdir(n, f->f_offset, dir);
+#ifdef USE_OS
 	mutex_unlock(n->v_lock);
+#endif
 	if(!err)
 		f->f_offset += dir->d_reclen;
+#ifdef USE_OS
 	mutex_unlock(f->f_lock);
-
+#endif
 	return err;
 }
 
@@ -1089,22 +1202,28 @@ int vfs_rewinddir(int fd)
 	f = vfs_fd_to_file(fd);
 	if(!f)
 		return -1;
-
+#ifdef USE_OS
 	mutex_lock(f->f_lock);
+#endif
 	n = f->f_node;
 	if(!n)
 	{
+#ifdef USE_OS
 		mutex_unlock(f->f_lock);
+#endif
 		return -1;
 	}
 	if(n->v_type != VNT_DIR)
 	{
+#ifdef USE_OS
 		mutex_unlock(f->f_lock);
+#endif
 		return -1;
 	}
 	f->f_offset = 0;
+#ifdef USE_OS
 	mutex_unlock(f->f_lock);
-
+#endif
 	return 0;
 }
 
@@ -1216,21 +1335,27 @@ void do_init_vfs(void)
 	int i;
 
 	init_list_head(&mnt_list);
+#ifdef USE_OS
 	mutex_init(mnt_list_lock);
-
+#endif
 	for(i = 0; i < VFS_MAX_FD; i++)
 	{
+#ifdef USE_OS
 		mutex_init(fd_file[i].f_lock);
+#endif
 		fd_file[i].f_node = NULL;
 		fd_file[i].f_offset = 0;
 		fd_file[i].f_flags = 0;
 	}
+#ifdef USE_OS
 	mutex_init(fd_file_lock);
-
+#endif
 	for(i = 0; i < VFS_NODE_HASH_SIZE; i++)
 	{
 		init_list_head(&node_list[i]);
+#ifdef USE_OS
 		mutex_init(node_list_lock[i]);
+#endif
 	}
 }
 

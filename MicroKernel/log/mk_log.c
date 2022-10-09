@@ -31,7 +31,7 @@ void mk_log_register_print_cb(mk_log_print_g_cb_t print_cb)
 {
     custom_print_cb = print_cb;
 }
-uint8_t myuserinfo[1025];
+
 /**
  * Add a log
  * @param level the level of log. (From `mk_log_level_t` enum)
@@ -67,7 +67,6 @@ void _mk_log_add(mk_log_level_t level, const char * file, int line, const char *
          }
 
         static const char * lvl_prefix[] = {"Trace", "Info", "Warn", "Error", "User"};
-//        sprintf(myuserinfo,"%s: %s \t(%s #%d %s())\n", lvl_prefix[level], buf, &file[p], line, func);
         printf("%s: %s (%s #%d %s())\r\n", lvl_prefix[level], buf, &file[p], line, func);
 #else
         if(custom_print_cb) custom_print_cb(level, file, line, func, buf);

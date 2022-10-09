@@ -17,10 +17,15 @@
 
 #include "rtos.h"
 
-#include "cmsis_iccarm.h"
+//#include "cmsis_iccarm.h"
 
-#define MK_VERSION_M      1
-#define MK_VERSION_S      0
+/***************************
+ * CURRENT VERSION OF LVGL
+ ***************************/
+#define LVGL_VERSION_MAJOR 0
+#define LVGL_VERSION_MINOR 1
+#define LVGL_VERSION_PATCH 0
+#define LVGL_VERSION_INFO ""
 
 //is enable log
 #define MK_USE_LOG

@@ -103,7 +103,9 @@ struct vfs_node_t {
 	enum vfs_node_type_t v_type;
 #ifdef USE_FREERTOS
 	SemaphoreHandle_t v_lock;
-//#elif USER_THREADX
+#endif
+#ifdef USE_THREADX
+	TX_MUTEX v_lock;
 #endif
 	uint16_t v_mode;
 	void * v_data;
@@ -124,7 +126,9 @@ struct vfs_mount_t {
 	struct vfs_node_t * m_covered;
 #ifdef USE_FREERTOS
 	SemaphoreHandle_t m_lock;
-//#elif USER_THREADX
+#endif
+#ifdef USE_THREADX
+	TX_MUTEX m_lock;
 #endif
 	void * m_data;
 };
