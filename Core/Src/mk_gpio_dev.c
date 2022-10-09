@@ -1,5 +1,4 @@
 #include "microkernel.h"
-#include <stdio.h>
 
 static int16_t led_ioctl(struct kobj_t * kobj, uint16_t cmd, void * buf)
 {
@@ -11,18 +10,6 @@ static int16_t led_ioctl(struct kobj_t * kobj, uint16_t cmd, void * buf)
 	return 0;
 }
 
-struct device_info_t{
-	uint8_t * device_name;
-	uint8_t * node_name;
-	uint8_t * attribute;
-};
-
-struct register_info_t{
-	uint8_t * driver_name;
-	uint8_t device_num;
-	void * device_private;
-};
-
 //注册LED设备
 struct device_t * register_led_dev(struct register_info_t * dev_info)
 {
@@ -32,23 +19,23 @@ struct device_t * register_led_dev(struct register_info_t * dev_info)
 
 	while(i < dev_info->device_num)
 	 {
-		dev = malloc(sizeof(struct device_t));
+		dev = MK_MALLOC(sizeof(struct device_t));//malloc(sizeof(struct device_t));
 		if(!dev)
-			return NULL;
+		  return NULL;
 		dev->name = gpio_dev->device_name;
 		dev->type = DEVICE_TYPE_LED;//类型是LED
-		//--------------------查找通信总线-----------------------------
+		//--------------------查找通信总线进行捆绑-----------------------------
 		dev->driver = search_driver(dev_info->driver_name);
-		struct kobj_t * gp = kobj_search(dev->driver->kobj, gpio_dev->node_name);//寻找节点
+		struct kobj_t * gp_drv = kobj_search(dev->driver->kobj, gpio_dev->node_name);//寻找节点
 		//------------------------------------------------------------
 		dev->kobj = kobj_alloc_directory(dev->name);
-		kobj_add_regular(dev->kobj, gpio_dev->attribute , NULL, NULL, led_ioctl, gp);//赋能LED开关属性
+		kobj_add_regular(dev->kobj, gpio_dev->attribute , NULL, NULL, led_ioctl, gp_drv);//赋能LED开关属性
 
 		if(!register_device(dev))
 		{
 			kobj_remove_self(dev->kobj);
-			//free(dev->name);
-			free(dev);
+			//MK_FREE(dev->name);
+			MK_FREE(dev);
 			return NULL;
 		}
 		i++;
@@ -90,8 +77,8 @@ int unregister_led_dev(void)
 	if(dev && unregister_device(dev))
 	 {
 		ret = kobj_remove_self(dev->kobj);
-		free(dev->name);
-		free(dev);
+		MK_FREE(dev->name);
+		MK_FREE(dev);
 	 }
 	return ret;
 }

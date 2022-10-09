@@ -1229,6 +1229,9 @@
         <group>
             <name>STM32F4xx_HAL_Driver</name>
             <file>
+                <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_dma.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_exti.c</name>
             </file>
             <file>
@@ -1236,6 +1239,9 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_rcc.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_usart.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_utils.c</name>
@@ -1266,6 +1272,12 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\MicroKernel\filesystem\vfs.c</name>
+            </file>
+        </group>
+        <group>
+            <name>log</name>
+            <file>
+                <name>$PROJ_DIR$\..\MicroKernel\log\mk_log.c</name>
             </file>
         </group>
     </group>

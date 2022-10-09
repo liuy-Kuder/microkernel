@@ -20,7 +20,7 @@ struct gpio_drv_t
 };
 
 struct gpio_driver_t{
-	uint8_t* node_name;
+	char* node_name;
 	uint32_t pin;
 	GPIO_TypeDef *GPIOx;
 };

@@ -476,7 +476,7 @@ uint8_t register_device(struct device_t * dev)
 	init_hlist_node(&dev->node);
 	hlist_add_head(&dev->node, device_hash(dev->name));
 	spin_unlock_irq();
-	sprintf(Ibuf,"%s device install success!",dev->name);
+	sprintf(Ibuf,"%s device install success!\n",dev->name);
 	MK_LOG_INFO(Ibuf);
 	DeviceIncrease();
 	return TRUE;

@@ -1,7 +1,7 @@
 #include "microkernel.h"
 #include "mk_gpio_drv.h"
-#include "stdio.h"
 #include "stm32f4xx_ll_gpio.h"
+
 
 uint32_t mk_gp_write(struct gpio_drv_t * gp, int pin)
 {
@@ -40,46 +40,13 @@ static int16_t gpio_reg(struct kobj_t * kobj, uint16_t cmd, void * buf)
 	return 0;
 }
 
-struct device_t * mk_gp_probe_bak(struct driver_t * drv)
-{
-	struct gpio_drv_t * gp[2] = NULL;
-	struct device_t * dev;
-	for(uint8_t i = 0; i < 2; i++)
-	{
-		gp[i] = malloc(sizeof(struct gpio_drv_t));
-		if(!gp[i])
-		 {
-			return NULL;
-		 }
-
-		gp[i]->GPIOx = GPIOF;
-		if(i == 1)
-		  gp[i]->pin = LL_GPIO_PIN_10;
-		else
-		  gp[i]->pin = LL_GPIO_PIN_9;
-		kobj_add_regular(drv->kobj, i == 0 ? "gpio9" : "gpio10", NULL, NULL, gpio_reg, gp[i]);
-	}
-#if 0
-	gp = malloc(sizeof(struct gpio_drv_t));
-	if(!gp)
-	 {
-		return NULL;
-	 }
-
-	gp->GPIOx = GPIOF;
-	gp->pin = LL_GPIO_PIN_9;
-	kobj_add_regular(drv->kobj, "gpio9", NULL, NULL, gpio_reg, gp);
-	kobj_add_regular(drv->kobj, "gpio10", NULL, NULL, gpio_reg, gp);
-#endif
-	return dev;
-}
 
 struct device_t * mk_gp_probe(struct driver_t * drv,struct driver_info_t * drv_info)
 {
 	struct gpio_driver_t * gpio_drv = (struct gpio_driver_t *)drv_info->drv_private;
 
 	//struct gpio_driver_t * gpio = NULL;
-	struct device_t * dev;
+//	struct device_t * dev;
 	uint16_t i = 0;
 	while(i < drv_info->drv_num)
 	{
@@ -105,9 +72,9 @@ static void mk_gp_remove(struct device_t * dev)
 
 	if(gp)
 	{
-		unregister_adc(gp);
+	//	unregister_adc(gp);
 		//free_device_name(gp->name);
-		free(gp);
+		MK_FREE(gp);
 	}
 }
 
@@ -131,15 +98,6 @@ void mk_gpio_driver_init(void)
 void mk_gpio_driver_exit(void)
 {
 	unregister_driver(&gpio);
-}
-
-//探索总线驱动
-void Probe_BusDriver(void)
-{
-	struct driver_t * drv;
-	drv = search_driver("gpio");
-//if(drv != NULL)
-	// drv->probe(drv);
 }
 
 struct gpio_driver_t gpio_drv_info[] = {
