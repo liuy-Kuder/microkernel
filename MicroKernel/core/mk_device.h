@@ -61,17 +61,10 @@ struct device_t
 	struct list_head list;
 	struct list_head head;
 	struct hlist_node node;
-
 	char * name;
 	enum device_type_t type;
 	struct driver_t * driver;
 	void * priv;
-};
-
-struct device_info_t{
-	char * device_name;
-	char * node_name;
-	char * attribute;
 };
 
 struct register_info_t{
@@ -88,8 +81,8 @@ int free_device_name(char * name);
 struct device_t * search_device(const char * name, enum device_type_t type);
 struct device_t * search_first_device(enum device_type_t type);
 uint16_t GetDeviceNum(void);
-uint8_t register_device(struct device_t * dev);
-uint8_t unregister_device(struct device_t * dev);
+int register_device(struct device_t * dev);
+int unregister_device(struct device_t * dev);
 void remove_device(struct device_t * dev);
 void device_pure_init(void);
 #ifdef __cplusplus

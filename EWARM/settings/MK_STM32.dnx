@@ -20,7 +20,7 @@
         <LeaveTargetRunning>_ 0</LeaveTargetRunning>
     </JLinkDriver>
     <DebugChecksum>
-        <Checksum>4166405780</Checksum>
+        <Checksum>1638112046</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
@@ -58,11 +58,17 @@
         <Path>F:\项目开发中\stm32f407zgt6\mk_stm32\development\EWARM\MK_STM32\Exe\MK_STM32.bin</Path>
     </RecentFlashDownload>
     <struct_types>
-        <Fmt0>struct vfs_node_t-v_mode	4	0</Fmt0>
+        <Fmt0>struct device_priv_t-addr	4	0</Fmt0>
+        <Fmt1>struct i2c_msg_t-addr	4	0</Fmt1>
+        <Fmt2>struct vfs_node_t-v_mode	4	0</Fmt2>
+        <Fmt3>struct vfs_node_t-v_size	4	0</Fmt3>
     </struct_types>
     <watch_formats>
         <Fmt0>{W}1:buf	0	2</Fmt0>
         <Fmt1>{W}1:m	4	0</Fmt1>
+        <Fmt2>{W}1:valReg	4	0</Fmt2>
+        <Fmt3>{W}1:voltage_code	4	0</Fmt3>
+        <Fmt4>{W}42:readAddr	4	0</Fmt4>
     </watch_formats>
     <Trace1>
         <Enabled>0</Enabled>
@@ -129,13 +135,13 @@
         <Bp0>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\Core\Src\test_mk_adc.c}.25.2" 0 0 1 "" 0 "" 0</Bp0>
         <Bp1>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\Core\Src\test_mk_adc.c}.9.5" 0 0 1 "" 0 "" 0</Bp1>
         <Bp2>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\Core\Src\test_mk_adc.c}.52.1" 0 0 1 "" 0 "" 0</Bp2>
-        <Bp3>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\MicroKernel\filesystem\sysfs.c}.148.2" 0 0 1 "" 0 "" 0</Bp3>
-        <Bp4>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\MicroKernel\filesystem\sysfs.c}.148.2" 0 0 1 "" 0 "" 0</Bp4>
-        <Bp5>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\MicroKernel\filesystem\sysfs.c}.148.2" 0 0 1 "" 0 "" 0</Bp5>
-        <Bp6>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\MicroKernel\filesystem\sysfs.c}.148.2" 0 0 1 "" 0 "" 0</Bp6>
-        <Bp7>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\MicroKernel\filesystem\vfs.c}.1337.2" 0 0 1 "" 0 "" 0</Bp7>
-        <Bp8>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\MicroKernel\filesystem\vfs.c}.1337.2" 0 0 1 "" 0 "" 0</Bp8>
-        <Bp9>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\Core\Src\mk_gpio_drv.c}.0.1" 0 0 1 "" 0 "" 0</Bp9>
+        <Bp3>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\MicroKernel\filesystem\sysfs.c}.148.3" 0 0 1 "" 0 "" 0</Bp3>
+        <Bp4>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\MicroKernel\filesystem\sysfs.c}.148.3" 0 0 1 "" 0 "" 0</Bp4>
+        <Bp5>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\MicroKernel\filesystem\sysfs.c}.148.3" 0 0 1 "" 0 "" 0</Bp5>
+        <Bp6>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\MicroKernel\filesystem\sysfs.c}.148.3" 0 0 1 "" 0 "" 0</Bp6>
+        <Bp7>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\MicroKernel\filesystem\vfs.c}.1411.2" 0 0 1 "" 0 "" 0</Bp7>
+        <Bp8>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\MicroKernel\filesystem\vfs.c}.1411.2" 0 0 1 "" 0 "" 0</Bp8>
+        <Bp9>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\Core\Src\mk_gpio_drv.c}.152.1" 0 0 1 "" 0 "" 0</Bp9>
         <Bp10>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\MicroKernel\filesystem\vfs.c}.1.1" 0 0 1 "" 0 "" 0</Bp10>
         <Count>11</Count>
     </Breakpoints2>

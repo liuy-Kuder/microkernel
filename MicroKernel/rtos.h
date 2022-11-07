@@ -26,7 +26,8 @@
 #endif
 
 #ifdef USE_THREADX
-/*
+
+#if 0
 sample:
 uint8_t MKPoolBuf[1024*30];//30k
 TX_BYTE_POOL MK_pool;
@@ -36,8 +37,7 @@ TX_BYTE_POOL MK_pool;
             "MK_pool",
             (VOID *)MKPoolBuf,     /* 内存池地址，需要保证4字节对齐 */
             sizeof(MKPoolBuf));    /* 内存池大小 */
-
-*/
+#endif
 
     #include "tx_api.h"
 

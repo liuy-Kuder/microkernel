@@ -10,10 +10,11 @@ extern "C" {
 #include <stdint.h>
 #include "rtos.h"
 
+//VFS系统
 #define VFS_MAX_PATH		(1024)//绝对路径的最大字符
 #define	VFS_MAX_NAME		(64)
-#define VFS_MAX_FD			(32)
-#define VFS_NODE_HASH_SIZE	(32)
+#define VFS_MAX_FD			(64)
+#define VFS_NODE_HASH_SIZE	(64)
 
 #define O_RDONLY			(1 << 0)//只读
 #define O_WRONLY			(1 << 1)//只写
@@ -47,6 +48,10 @@ extern "C" {
 #define	R_OK				(1 << 2) //是否具有读权限
 #define	W_OK				(1 << 1) //是否具有可写权限
 #define	X_OK				(1 << 0) //是否具有可执行权限
+
+#define VFS_SEEK_SET		(0)
+#define VFS_SEEK_CUR		(1)
+#define VFS_SEEK_END		(2)
 
 struct vfs_stat_t;
 struct vfs_dirent_t;
@@ -108,6 +113,7 @@ struct vfs_node_t {
 	TX_MUTEX v_lock;
 #endif
 	uint16_t v_mode;
+	size_t v_size;
 	void * v_data;
 };
 
@@ -139,8 +145,8 @@ struct filesystem_t {
 	const char * name;
     int (*mount)(struct vfs_mount_t *, const char *);
 	int (*unmount)(struct vfs_mount_t *);
-    int32_t (*read)(struct vfs_node_t *, void *, uint64_t);
-	int32_t (*write)(struct vfs_node_t *, void *, uint64_t);
+    size_t (*read)(struct vfs_node_t *, size_t, void *, size_t);
+	size_t (*write)(struct vfs_node_t *, size_t, void *, size_t);
 	int16_t (*ioctl)(struct vfs_node_t *, uint16_t, void *);
 	int (*readdir)(struct vfs_node_t *, int64_t, struct vfs_dirent_t *);
 	int (*lookup)(struct vfs_node_t *, const char *, struct vfs_node_t *);
@@ -159,9 +165,10 @@ struct vfs_mount_t * vfs_mount_get(int index);
 int vfs_mount_count(void);
 int vfs_open(const char * path, uint32_t flags);
 int vfs_close(int fd);
-int32_t vfs_read(int fd, void * buf, uint32_t len);
-int32_t vfs_write(int fd, void * buf, uint32_t len);
-int16_t vfs_ioctl(int fd, uint64_t cmd, void * buf);
+size_t vfs_lseek(int fd, size_t offset, int whence);
+size_t vfs_read(int fd, void * buf, size_t len);
+size_t vfs_write(int fd, void * buf, size_t len);
+int16_t vfs_ioctl(int fd, uint16_t cmd, void *buf);
 int vfs_fstat(int fd, struct vfs_stat_t * st);
 int vfs_opendir(const char * name);
 int vfs_closedir(int fd);

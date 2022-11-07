@@ -23,6 +23,10 @@ F:\项目开发中\stm32f407zgt6\mk_stm32\development\EWARM/../Middlewares/Third
 -I
 F:\项目开发中\stm32f407zgt6\mk_stm32\development\EWARM\..\MicroKernel\log
 -I
+F:\项目开发中\stm32f407zgt6\mk_stm32\development\EWARM\..\Board\driver\I2cSim
+-I
+F:\项目开发中\stm32f407zgt6\mk_stm32\development\EWARM\..\Board\device\ltc2944
+-I
 D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\inc
 -I
 D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\inc\c
@@ -44,6 +48,10 @@ F:\项目开发中\stm32f407zgt6\mk_stm32\development\Middlewares\Third_Party\Fr
 F:\项目开发中\stm32f407zgt6\mk_stm32\development\Middlewares\Third_Party\FreeRTOS\Source\portable\IAR\ARM_CM4F
 -I
 F:\项目开发中\stm32f407zgt6\mk_stm32\development\MicroKernel\log
+-I
+F:\项目开发中\stm32f407zgt6\mk_stm32\development\Board\driver\I2cSim
+-I
+F:\项目开发中\stm32f407zgt6\mk_stm32\development\Board\device\ltc2944
 -D__CHAR_BITS__=8
 -D__CHAR_MAX__=127
 -D__CHAR_MIN__=(-__CHAR_MAX__-1)

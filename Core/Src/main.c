@@ -20,6 +20,7 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "microkernel.h"
+#include "ltc2944.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -148,16 +149,19 @@ int main(void)
     mk_init();//初始化MK组件
     //adc_d1_driver_init();//注册驱动
     //probe_device();//搜索驱动并注册设�??
-
 //-------------驱动二次开发
-    mk_gpio_driver_init();//gpio总线初始化
-    init_driver();//分配总线
-    init_led_device();//初始化驱动
-    
+ //   mk_gpio_driver_init();//gpio总线初始化
+  //  init_driver();//分配总线
+  //  init_led_device();//初始化驱动
+
+   // init_ltc2944_device();
+    I2cSim_driver_init();
+    init_I2cSim_driver();
+    init_ltc2944_device();
   //  test_dev = search_first_device(DEVICE_TYPE_LED);
     //unregister_gpdev();
 //-----------------------
-
+    StartDefaultTask(NULL);
 #if 0
 //----------------设备应用---------------------
     uint8_t buf[5];
@@ -207,39 +211,6 @@ int main(void)
     if(ret < 0)
       LL_mDelay(1000);
   }
-#endif
-//------------------------------------------------
-#if 0
-//----------------设备应用---------------------
-  uint8_t buf[5];
-//打开
-  fdreg = vfs_open("/device/adc/adc_test/ioctl", O_RDONLY);
-  if(fdreg < 0)
-    LL_mDelay(1000);
-//读取
-  ret = vfs_ioctl(fdreg, 5,NULL);
-  if(ret < 0)
-    LL_mDelay(1000);
-//关闭
-  ret = vfs_close(fdreg);
-  if(ret < 0)
-    LL_mDelay(1000);
-#endif
-//----------------驱动应用---------------------
-#if 0
-  uint8_t buf[5];
-//打开
-  fdreg = vfs_open("/driver/adc-d1/probe", O_RDONLY);
-  if(fdreg < 0)
-    LL_mDelay(1000);
-//读取
-  ret = vfs_write(fdreg, buf,5);
-  if(ret < 0)
-    LL_mDelay(1000);
-//关闭
-  ret = vfs_close(fdreg);
-  if(ret < 0)
-    LL_mDelay(1000);
 #endif
 
 #endif
@@ -370,7 +341,8 @@ static void MX_GPIO_Init(void)
   LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOF);
   LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOH);
   LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOA);
-
+  LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOE);
+  LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOB);
   /**/
   LL_GPIO_SetOutputPin(GPIOF, LED0_Pin|LED1_Pin);
 
@@ -382,6 +354,15 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
   LL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
+  //I2C
+  LL_GPIO_SetOutputPin(GPIOB, LL_GPIO_PIN_8 | LL_GPIO_PIN_9);
+  GPIO_InitStruct.Pin = LL_GPIO_PIN_8 | LL_GPIO_PIN_9;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
+  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_OPENDRAIN;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;
+  LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
 }
 
 /* USER CODE BEGIN 4 */
@@ -389,6 +370,8 @@ static void MX_GPIO_Init(void)
 /* USER CODE END 4 */
 size_t Sizelen=0;
 int devnum = 0;
+uint8_t kbuf[5];
+float voltVal = 0;
 /* USER CODE BEGIN Header_StartDefaultTask */
 /**
   * @brief  Function implementing the defaultTask thread.
@@ -401,8 +384,9 @@ void StartDefaultTask(void *argument)
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
   //----------------设备应用---------------------
-    uint8_t buf[5];
+
 //打开
+/*
     fdreg = vfs_open("/device/led/red/switch", O_CTLONLY);
     if(fdreg > 0)
      {
@@ -416,12 +400,28 @@ void StartDefaultTask(void *argument)
         if(ret < 0)
           LL_mDelay(1000);
      }
+     */
+  //打开
+    fdreg = vfs_open("/device/i2c/ltc2944", O_RDONLY);
+    if(fdreg < 0)
+      while(1);
     Sizelen = xPortGetFreeHeapSize();
     devnum = GetDeviceNum();
     for(;;)
     {
-      osDelay(1);
+      ret = vfs_lseek(fdreg,LTC2943_VOLTAGE_REG,SEEK_SET);//偏移2个
+      if(ret < 0)
+        while(1);
+    //读取
+      ret = vfs_read(fdreg, &voltVal, 2);
+      if(ret < 0)
+        while(1);
+      osDelay(1000);
     }
+      //关闭
+    ret = vfs_close(fdreg);
+    if(ret < 0)
+      while(1);
   /* USER CODE END 5 */
 }
 

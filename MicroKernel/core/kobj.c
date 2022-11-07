@@ -23,6 +23,7 @@ static struct kobj_t * __kobj_root = NULL;
 *		read: 读节点
 *		write: 写节点
 *		ioctl: IO操作
+*		size: 该节点可寻址空间
 *		priv: 私有数据块
 *返回值：分配的kobj节点
 *其他说明：无
@@ -31,7 +32,7 @@ static struct kobj_t * __kobj_root = NULL;
 *2022.9.12     1.0        刘杨
 **********************************************************************/
 static struct kobj_t * __kobj_alloc(const char * name, enum kobj_type_t type,\
-									kobj_read_t read, kobj_write_t write, kobj_ioctl_t ioctl,void * priv)
+									kobj_read_t read, kobj_write_t write, kobj_ioctl_t ioctl, size_t size, void * priv)
 {
 	struct kobj_t * kobj;
 
@@ -51,6 +52,7 @@ static struct kobj_t * __kobj_alloc(const char * name, enum kobj_type_t type,\
 	kobj->write = write;
 	kobj->priv = priv;
 	kobj->ioctl = ioctl;
+	kobj->size = size;
 	return kobj;
 }
 /********************************************************************
@@ -89,7 +91,7 @@ struct kobj_t * kobj_search(struct kobj_t * parent, const char * name)
 	struct kobj_t * pos, * n;//pos位置,临时变量n
 
 	if(!parent)//参数不为空
-		return NULL;
+	 return NULL;
 
 	if(parent->type != KOBJ_TYPE_DIR)//类型不是目录
 		return NULL;
@@ -164,7 +166,7 @@ struct kobj_t * kobj_search_directory_with_create(struct kobj_t * parent, const 
 **********************************************************************/
 struct kobj_t * kobj_alloc_directory(const char * name)
 {
-	return __kobj_alloc(name, KOBJ_TYPE_DIR, NULL, NULL, NULL, NULL);
+	return __kobj_alloc(name, KOBJ_TYPE_DIR, NULL, NULL, NULL, 0, NULL);
 }
 
 /********************************************************************
@@ -175,6 +177,7 @@ struct kobj_t * kobj_alloc_directory(const char * name)
 *		read: 读节点
 *		write: 写节点
 *		ioctl: IO操作
+*		size: 该节点可寻址空间
 *		priv: 私有数据块
 *返回值：kobj
 *其他说明：无
@@ -182,9 +185,9 @@ struct kobj_t * kobj_alloc_directory(const char * name)
 *---------------------------------------------------------------------
 *2022.9.12     1.0        刘杨
 **********************************************************************/
-struct kobj_t * kobj_alloc_regular(const char * name, kobj_read_t read, kobj_write_t write, kobj_ioctl_t ioctl, void * priv)
+struct kobj_t * kobj_alloc_regular(const char * name, kobj_read_t read, kobj_write_t write, kobj_ioctl_t ioctl, size_t size, void * priv)
 {
-	return __kobj_alloc(name, KOBJ_TYPE_REG, read, write, ioctl, priv);
+	return __kobj_alloc(name, KOBJ_TYPE_REG, read, write, ioctl, size, priv);
 }
 
 /********************************************************************
@@ -336,7 +339,7 @@ uint8_t kobj_add_directory(struct kobj_t * parent, const char * name)
 *2022.9.12     1.0        刘杨
 **********************************************************************/
 uint8_t kobj_add_regular(struct kobj_t * parent, const char * name, \
-						 kobj_read_t read, kobj_write_t write, kobj_ioctl_t ioctl, void * priv)
+						 kobj_read_t read, kobj_write_t write, kobj_ioctl_t ioctl,size_t size, void * priv)
 {
 	struct kobj_t * kobj;
 
@@ -352,7 +355,7 @@ uint8_t kobj_add_regular(struct kobj_t * parent, const char * name, \
 	if(kobj_search(parent, name))
 		return FALSE;
 
-	kobj = kobj_alloc_regular(name, read, write, ioctl, priv);
+	kobj = kobj_alloc_regular(name, read, write, ioctl, size, priv);
 	if(!kobj)
 		return FALSE;
 
@@ -420,5 +423,6 @@ uint32_t shash(const char * s)
 		while(*s)
 			v = (v << 5) + v + (*s++);
 	}
+	//MK_LOG_TRACE("string: %s,value: %d\n",s,v);
 	return v;
 }

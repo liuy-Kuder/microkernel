@@ -22,7 +22,7 @@ static int16_t adc_read_nchannel(struct kobj_t * kobj, void * buf, size_t size)
 	return 0;
 }
 
-static int16_t adc_ioctl(struct kobj_t * kobj, uint16_t cmd, void * buf)
+static int16_t adc_ioctl(struct kobj_t * kobj, uint16_t cmd, ...)
 {
 	return 0;
 }

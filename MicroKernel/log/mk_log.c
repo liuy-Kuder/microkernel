@@ -2,10 +2,10 @@
 *
 *文件名称：mk_log.c
 *内容摘要：提供日志功能
-*当前版本：V1.0
+*当前版本：V1.1
 *作者：刘杨
-*完成时期：2022.10.3
-*其他说明: none
+*完成时期：2022.11.7
+*其他说明: 1.修改 snprintf 为 vsnprintf，提供args解析
 *
 **********************************************************************/
 
@@ -14,10 +14,7 @@
 
 #include <stdarg.h>
 #include <string.h>
-
-#if LV_LOG_PRINTF
-    #include <stdio.h>
-#endif
+#include <stdio.h>
 
 static mk_log_print_g_cb_t custom_print_cb;
 
@@ -45,15 +42,14 @@ void _mk_log_add(mk_log_level_t level, const char * file, int line, const char *
 {
     if(level >= _MK_LOG_LEVEL_NUM)
      return; /*Invalid level*/
-
+    
     if(level >= MK_LOG_LEVEL) 
      {
         va_list args;
         va_start(args, format);
-        char buf[256];
-        snprintf(buf, sizeof(buf), format, args);
+        char buf[256] = {0};
+        vsnprintf(buf, sizeof(buf),format, args);
         va_end(args);
-
 #if MK_LOG_PRINTF
         /*Use only the file name not the path*/
         size_t p;

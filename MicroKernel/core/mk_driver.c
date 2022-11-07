@@ -69,35 +69,29 @@ struct driver_t * search_driver(const char * name)
 *---------------------------------------------------------------------
 *2022.9.12     1.0        刘杨
 **********************************************************************/
-uint8_t register_driver(struct driver_t * drv)
+int register_driver(struct driver_t * drv)
 {
-	char Ibuf[128];
-
 	if(!drv || !drv->name)//空或无名字、返回假
 	 {
-		sprintf(Ibuf,"%s register driver fail!",drv->name);
-		MK_LOG_ERROR(Ibuf);
+		MK_LOG_ERROR("%s register driver null or name null!",drv->name);
 		return FALSE;
 	 }
 
 	if(!drv->probe || !drv->remove)//无管道或无移除、返回假
 	 {
-		sprintf(Ibuf,"%s register driver fail!",drv->name);
-		MK_LOG_ERROR(Ibuf);
+		MK_LOG_ERROR("%s register driver no probe or remove!",drv->name);
 		return FALSE;
 	 }
 
 	if(!drv->suspend || !drv->resume)//无暂停或无释放、返回假
 	 {
-		sprintf(Ibuf,"%s register driver fail!",drv->name);
-		MK_LOG_ERROR(Ibuf);
+		MK_LOG_ERROR("%s register driver no suspend or resume!",drv->name);
 		return FALSE;
 	 }
 
 	if(search_driver(drv->name))//寻找驱动名，如果相同则返回假
 	 {
-		sprintf(Ibuf,"%s register driver fail!",drv->name);
-		MK_LOG_ERROR(Ibuf);
+		MK_LOG_ERROR("%s register driver have same name!",drv->name);
 		return FALSE;
 	 }
 
@@ -108,8 +102,7 @@ uint8_t register_driver(struct driver_t * drv)
 	init_hlist_node(&drv->node);
 	hlist_add_head(&drv->node, driver_hash(drv->name));
 	spin_unlock_irq();//开中断
-	sprintf(Ibuf,"%s register driver success!",drv->name);
-	MK_LOG_INFO(Ibuf);
+	MK_LOG_TRACE("%s register driver success!",drv->name);
 	return TRUE;
 }
 
@@ -123,20 +116,17 @@ uint8_t register_driver(struct driver_t * drv)
 *---------------------------------------------------------------------
 *2022.9.12     1.0        刘杨
 **********************************************************************/
-uint8_t unregister_driver(struct driver_t * drv)
+int unregister_driver(struct driver_t * drv)
 {
-	char Ibuf[128];
 	if(!drv || !drv->name)
 	 {
-		sprintf(Ibuf,"%s unregister driver fail!",drv->name);
-		MK_LOG_ERROR(Ibuf);
+		MK_LOG_ERROR("%s unregister driver null or name null!",drv->name);
 		return FALSE;
 	 }
 
 	if(hlist_unhashed(&drv->node))
 	 {
-		sprintf(Ibuf,"%s unregister driver fail!",drv->name);
-		MK_LOG_ERROR(Ibuf);
+		MK_LOG_ERROR("%s unregister driver node is null!",drv->name);
 		return FALSE;
 	 }
 
@@ -144,8 +134,7 @@ uint8_t unregister_driver(struct driver_t * drv)
 	hlist_del(&drv->node);
 	spin_unlock_irq();
 	kobj_remove_self(drv->kobj);
-	sprintf(Ibuf,"%s unregister driver success!",drv->name);
-	MK_LOG_INFO(Ibuf);
+	MK_LOG_TRACE("%s unregister driver success!",drv->name);
 	return TRUE;
 }
 

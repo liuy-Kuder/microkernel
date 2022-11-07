@@ -197,13 +197,11 @@ static struct kobj_t * search_device_kobj(struct device_t * dev)
 **********************************************************************/
 static void suspend_device(struct device_t * dev)
 {
-	char Ibuf[128];
 	if(dev)
 	{
 		if(dev->driver && dev->driver->suspend)
 			dev->driver->suspend(dev);
-		sprintf(Ibuf,"%s suspend device success!",dev->name);
-		MK_LOG_INFO(Ibuf);
+		MK_LOG_TRACE("%s suspend device success!",dev->name);
 	}
 }
 
@@ -219,13 +217,11 @@ static void suspend_device(struct device_t * dev)
 **********************************************************************/
 static void resume_device(struct device_t * dev)
 {
-	char Ibuf[128];
 	if(dev)
 	 {
 		if(dev->driver && dev->driver->resume)
 			dev->driver->resume(dev);
-		sprintf(Ibuf,"%s resume device success!",dev->name);
-		MK_LOG_INFO(Ibuf);
+		MK_LOG_TRACE("%s resume device success!",dev->name);
 	 }
 }
 /********************************************************************
@@ -241,7 +237,7 @@ static void resume_device(struct device_t * dev)
 *---------------------------------------------------------------------
 *2022.9.12     1.0        刘杨
 **********************************************************************/
-static int16_t device_write_suspend(struct kobj_t * kobj, void * buf, size_t size)
+static size_t device_write_suspend(struct kobj_t * kobj, size_t offset, void * buf, size_t size)
 {
 	int ret = 0;
 	struct device_t * dev = (struct device_t *)kobj->priv;
@@ -264,7 +260,7 @@ static int16_t device_write_suspend(struct kobj_t * kobj, void * buf, size_t siz
 *---------------------------------------------------------------------
 *2022.9.12     1.0        刘杨
 **********************************************************************/
-static int16_t device_write_resume(struct kobj_t * kobj, void * buf, size_t size)
+static size_t device_write_resume(struct kobj_t * kobj,size_t offset, void * buf, size_t size)
 {
 	int ret = 0;
 	struct device_t * dev = (struct device_t *)kobj->priv;
@@ -398,7 +394,7 @@ struct device_t * search_first_device(enum device_type_t type)
 *2022.10.6     1.0        刘杨
 **********************************************************************/
 static uint16_t cnt = 0;
-static void DeviceIncrease(void)
+static void device_inc(void)
 {
 	cnt++;
 }
@@ -413,7 +409,7 @@ static void DeviceIncrease(void)
 *---------------------------------------------------------------------
 *2022.10.6     1.0        刘杨
 **********************************************************************/
-static void DeviceDecrease(void)
+static void device_dec(void)
 {
 	cnt--;
 }
@@ -441,32 +437,28 @@ uint16_t GetDeviceNum(void)
 *---------------------------------------------------------------------
 *2022.9.12      1.0       刘杨
 **********************************************************************/
-uint8_t register_device(struct device_t * dev)
+int register_device(struct device_t * dev)
 {
-	char Ibuf[128];
 	if(!dev || !dev->name)
 	 {
-		sprintf(Ibuf,"%s register device fail!",dev->name);
-		MK_LOG_ERROR(Ibuf);
+		MK_LOG_ERROR("%s register device null or name null!",dev->name);
 		return FALSE;
 	 }
 		
     if(dev->type >= ARRAY_SIZE(__device_head))
 	 {
-		sprintf(Ibuf,"%s register device fail!",dev->name);
-		MK_LOG_ERROR(Ibuf);
+		MK_LOG_ERROR("%s register device type over index!",dev->name);
 		return FALSE;
 	 }
 
 	if(device_exist(dev->name))
 	 {
-		sprintf(Ibuf,"%s register device fail!",dev->name);
-		MK_LOG_ERROR(Ibuf);
+		MK_LOG_ERROR("%s register device have existing!",dev->name);
 		return FALSE;
 	 }
 
-	kobj_add_regular(dev->kobj, "suspend", NULL, device_write_suspend,NULL, dev);
-	kobj_add_regular(dev->kobj, "resume", NULL, device_write_resume,NULL, dev);
+	kobj_add_regular(dev->kobj, "suspend", NULL, device_write_suspend,NULL, 0, dev);
+	kobj_add_regular(dev->kobj, "resume", NULL, device_write_resume,NULL, 0, dev);
 	kobj_add(search_device_kobj(dev), dev->kobj);
 	spin_lock_irq();
 	init_list_head(&dev->list);
@@ -476,9 +468,8 @@ uint8_t register_device(struct device_t * dev)
 	init_hlist_node(&dev->node);
 	hlist_add_head(&dev->node, device_hash(dev->name));
 	spin_unlock_irq();
-	sprintf(Ibuf,"%s device install success!\n",dev->name);
-	MK_LOG_INFO(Ibuf);
-	DeviceIncrease();
+	MK_LOG_TRACE("%s device install success!\n",dev->name);
+	device_inc();
 	return TRUE;
 }
 
@@ -492,27 +483,23 @@ uint8_t register_device(struct device_t * dev)
 *---------------------------------------------------------------------
 *2022.9.12      1.0       刘杨
 **********************************************************************/
-uint8_t unregister_device(struct device_t * dev)
+int unregister_device(struct device_t * dev)
 {
-	char Ibuf[128];
 	if(!dev || !dev->name)
 	 {
-		sprintf(Ibuf,"%s unregister device fail!",dev->name);
-		MK_LOG_ERROR(Ibuf);
+		MK_LOG_ERROR("%s unregister device null or name null!",dev->name);
 		return FALSE;
 	 }
 
     if(dev->type >= ARRAY_SIZE(__device_head))
 	 {
-		sprintf(Ibuf,"%s unregister device fail!",dev->name);
-		MK_LOG_ERROR(Ibuf);
+		MK_LOG_ERROR("%s unregister device type over index!",dev->name);
 		return FALSE;
 	 }
 
 	if(hlist_unhashed(&dev->node))
 	 {
-		sprintf(Ibuf,"%s unregister device fail!",dev->name);
-		MK_LOG_ERROR(Ibuf);
+		MK_LOG_ERROR("%s unregister device fail!",dev->name);
 		return FALSE;
 	 }
 
@@ -522,9 +509,8 @@ uint8_t unregister_device(struct device_t * dev)
 	hlist_del(&dev->node);
 	spin_unlock_irq();
 	kobj_remove(search_device_kobj(dev), dev->kobj);
-	sprintf(Ibuf,"%s unregister device success!",dev->name);
-	MK_LOG_INFO(Ibuf);
-	DeviceDecrease();
+	MK_LOG_TRACE("%s unregister device success!",dev->name);
+	device_dec();
 	return TRUE;
 }
 

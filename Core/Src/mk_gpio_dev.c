@@ -1,6 +1,6 @@
 #include "microkernel.h"
 
-static int16_t led_ioctl(struct kobj_t * kobj, uint16_t cmd, void * buf)
+static int16_t led_ioctl(struct kobj_t * kobj, uint16_t cmd, ...)
 {
     struct kobj_t * gp = (struct kobj_t *)kobj->priv;
 	if(gp->ioctl != NULL)

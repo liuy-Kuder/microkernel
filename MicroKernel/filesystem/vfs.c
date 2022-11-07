@@ -78,7 +78,7 @@ struct vfs_file_t {
 	TX_MUTEX f_lock;
 #endif
 	struct vfs_node_t * f_node;
-	int64_t f_offset;
+	size_t f_offset;
 	uint32_t f_flags;
 };
 
@@ -873,8 +873,80 @@ int vfs_close(int fd)
 	vfs_fd_free(fd);
 	return 0;
 }
+
+size_t vfs_lseek(int fd, size_t offset, int whence)
+{
+	struct vfs_node_t * n;
+	struct vfs_file_t * f;
+	int32_t ret;
+
+	f = vfs_fd_to_file(fd);
+	if(!f)
+		return 0;
+#ifdef USE_OS
+	mutex_lock(f->f_lock);
+#endif
+	n = f->f_node;
+	if(!n)
+	{
+		mutex_unlock(f->f_lock);
+		return 0;
+	}
+#ifdef USE_OS
+	mutex_lock(n->v_lock);
+#endif
+	switch(whence)
+	{
+	case VFS_SEEK_SET:
+		if(offset < 0)
+			offset = 0;
+		else if(offset > n->v_size)
+			offset = n->v_size;
+		break;
+
+	case VFS_SEEK_CUR:
+		if((f->f_offset + offset) > n->v_size)
+			offset = n->v_size;
+		else if((f->f_offset + offset) < 0)
+			offset = 0;
+		else
+			offset = f->f_offset + offset;
+		break;
+
+	case VFS_SEEK_END:
+		if(offset > 0)
+			offset = n->v_size;
+		else if((n->v_size + offset) < 0)
+			offset = 0;
+		else
+			offset = n->v_size + offset;
+		break;
+
+	default:
+#ifdef USE_OS
+		mutex_unlock(n->v_lock);
+#endif
+		ret = f->f_offset;
+#ifdef USE_OS
+		mutex_unlock(f->f_lock);
+#endif
+		return ret;
+	}
+
+	if(offset <= n->v_size)
+		f->f_offset = offset;
+#ifdef USE_OS
+	mutex_unlock(n->v_lock);
+#endif
+	ret = f->f_offset;
+#ifdef USE_OS
+	mutex_unlock(f->f_lock);
+#endif
+	return ret;
+}
+
 //文件节点的读取
-int32_t vfs_read(int fd, void * buf, uint32_t len)
+size_t vfs_read(int fd, void * buf, size_t len)
 {
 	struct vfs_node_t * n;
 	struct vfs_file_t * f;
@@ -924,7 +996,8 @@ int32_t vfs_read(int fd, void * buf, uint32_t len)
 #ifdef USE_OS
 	mutex_lock(n->v_lock);
 #endif
-	ret = n->v_mount->m_fs->read(n, buf, len);
+    ret = n->v_mount->m_fs->read(n, f->f_offset, buf, len);
+	f->f_offset += ret;
 #ifdef USE_OS
 	mutex_unlock(n->v_lock);
 	mutex_unlock(f->f_lock);
@@ -933,22 +1006,22 @@ int32_t vfs_read(int fd, void * buf, uint32_t len)
 }
 
 //文件节点的写入
-int32_t vfs_write(int fd, void * buf, uint32_t len)
+size_t vfs_write(int fd, void * buf, size_t len)
 {
 	struct vfs_node_t * n;
 	struct vfs_file_t * f;
-	int32_t ret = 0;
+	size_t ret = 0;
 
 	if(!buf || !len)
 	 {
-		ret = -1;
+		ret = 0;
 		return ret;
 	 }
 
 	f = vfs_fd_to_file(fd);
 	if(!f)
 	 {
-		ret = -1;
+		ret = 0;
 		return ret;
 	 }
 #ifdef USE_OS
@@ -960,7 +1033,7 @@ int32_t vfs_write(int fd, void * buf, uint32_t len)
 #ifdef USE_OS
 		mutex_unlock(f->f_lock);
 #endif
-		ret = -1;
+		ret = 0;
 		return ret;
 	 }
 	if(n->v_type != VNT_REG)
@@ -968,7 +1041,7 @@ int32_t vfs_write(int fd, void * buf, uint32_t len)
 #ifdef USE_OS
 		mutex_unlock(f->f_lock);
 #endif
-		ret = -1;
+		ret = 0;
 		return ret;
 	 }
 
@@ -977,13 +1050,14 @@ int32_t vfs_write(int fd, void * buf, uint32_t len)
 #ifdef USE_OS
 		mutex_unlock(f->f_lock);
 #endif
-		ret = -1;
+		ret = 0;
 		return ret;
 	 }
 #ifdef USE_OS
 	mutex_lock(n->v_lock);
 #endif
-	ret = n->v_mount->m_fs->write(n, buf, len);
+	ret = n->v_mount->m_fs->write(n, f->f_offset, buf, len);
+	f->f_offset += ret;
 #ifdef USE_OS
 	mutex_unlock(n->v_lock);
 	mutex_unlock(f->f_lock);
@@ -992,7 +1066,7 @@ int32_t vfs_write(int fd, void * buf, uint32_t len)
 }
 
 //文件节点的读取
-int16_t vfs_ioctl(int fd, uint64_t cmd, void * buf)
+int16_t vfs_ioctl(int fd, uint16_t cmd,void *buf)
 {
 	struct vfs_node_t * n;
 	struct vfs_file_t * f;
@@ -1035,7 +1109,7 @@ int16_t vfs_ioctl(int fd, uint64_t cmd, void * buf)
 #ifdef USE_OS
 	mutex_lock(n->v_lock);
 #endif
-	err = n->v_mount->m_fs->ioctl(n, cmd, buf);
+	err = n->v_mount->m_fs->ioctl(n, cmd,buf);
 #ifdef USE_OS
 	mutex_unlock(n->v_lock);
 	mutex_unlock(f->f_lock);

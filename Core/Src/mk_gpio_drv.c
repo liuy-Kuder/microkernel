@@ -29,7 +29,7 @@ int16_t mk_gp_read_reg(struct kobj_t * kobj, void * buf, size_t size)
     return 0;
 }
 
-static int16_t gpio_reg(struct kobj_t * kobj, uint16_t cmd, void * buf)
+static int16_t gpio_reg(struct kobj_t * kobj, uint16_t cmd, ...)
 {
  //   struct gpio_drv_t * gpio = (struct gpio_drv_t *)kobj->priv;
 	struct gpio_driver_t * gpio = (struct gpio_driver_t *)kobj->priv;

@@ -1204,6 +1204,9 @@
                     <name>$PROJ_DIR$\..\Core\Src\adc_driver.c</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\Core\Src\freertos.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\Core\Src\main.c</name>
                 </file>
                 <file>
@@ -1219,6 +1222,24 @@
         </group>
     </group>
     <group>
+        <name>Board</name>
+        <group>
+            <name>device</name>
+            <file>
+                <name>$PROJ_DIR$\..\Board\device\ltc2944\ltc2944.c</name>
+            </file>
+        </group>
+        <group>
+            <name>driver</name>
+            <file>
+                <name>$PROJ_DIR$\..\Board\driver\i2c\i2c.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Board\driver\I2cSim\I2cSim.c</name>
+            </file>
+        </group>
+    </group>
+    <group>
         <name>Drivers</name>
         <group>
             <name>CMSIS</name>
@@ -1228,6 +1249,9 @@
         </group>
         <group>
             <name>STM32F4xx_HAL_Driver</name>
+            <file>
+                <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_gpio.c</name>
+            </file>
             <file>
                 <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_dma.c</name>
             </file>
@@ -1278,6 +1302,45 @@
             <name>log</name>
             <file>
                 <name>$PROJ_DIR$\..\MicroKernel\log\mk_log.c</name>
+            </file>
+        </group>
+    </group>
+    <group>
+        <name>Middlewares</name>
+        <group>
+            <name>FreeRTOS</name>
+            <file>
+                <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS_V2\cmsis_os2.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\croutine.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\event_groups.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\portable\MemMang\heap_4.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\list.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\portable\IAR\ARM_CM4F\port.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\portable\IAR\ARM_CM4F\portasm.s</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\queue.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\stream_buffer.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\tasks.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\timers.c</name>
             </file>
         </group>
     </group>

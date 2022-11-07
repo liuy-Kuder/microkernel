@@ -19,17 +19,16 @@ struct driver_t
 {
 	struct kobj_t * kobj;
 	struct hlist_node node;
-
-	char * name;
-	struct device_t * (*probe)(struct driver_t * drv,struct driver_info_t * drv_info);
-	void (*remove)(struct device_t * dev);
-	void (*suspend)(struct device_t * dev);
-	void (*resume)(struct device_t * dev);
+	char *name;
+	int (*probe)(struct driver_t * drv,struct driver_info_t * drv_info);
+	int (*remove)(struct device_t * dev);
+	int (*suspend)(struct device_t * dev);
+	int (*resume)(struct device_t * dev);
 };
 
 struct driver_t * search_driver(const char * name);
-uint8_t register_driver(struct driver_t * drv);
-uint8_t unregister_driver(struct driver_t * drv);
+int register_driver(struct driver_t * drv);
+int unregister_driver(struct driver_t * drv);
 void driver_pure_init(void);
 
 #ifdef __cplusplus

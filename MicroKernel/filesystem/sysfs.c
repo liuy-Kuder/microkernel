@@ -64,17 +64,15 @@ static int sys_unmount(struct vfs_mount_t * m)
 *---------------------------------------------------------------------
 *2022.10.03     1.0        刘杨
 **********************************************************************/
-static int32_t sys_read(struct vfs_node_t * n, void * buf, uint64_t len)
+static size_t sys_read(struct vfs_node_t * n, size_t offset, void * buf, size_t len)
 {
 	struct kobj_t * kobj;
 
 	if(n->v_type != VNT_REG)
 		return -1;
-
 	kobj = n->v_data;
 	if(kobj && kobj->read)
-	  return kobj->read(kobj, buf, len);
-
+	  return kobj->read(kobj, offset, buf, len);
 	return -1;
 }
 
@@ -91,7 +89,7 @@ static int32_t sys_read(struct vfs_node_t * n, void * buf, uint64_t len)
 *---------------------------------------------------------------------
 *2022.10.03     1.0        刘杨
 **********************************************************************/
-static int32_t sys_write(struct vfs_node_t * n, void * buf, uint64_t len)
+static size_t sys_write(struct vfs_node_t * n, size_t offset, void * buf, size_t len)
 {
 	struct kobj_t * kobj;
 
@@ -99,7 +97,7 @@ static int32_t sys_write(struct vfs_node_t * n, void * buf, uint64_t len)
 		return -1;
 	kobj = n->v_data;
 	if(kobj && kobj->write)
-	  return kobj->write(kobj, buf, len);
+	  return kobj->write(kobj, offset, buf, len);
 	return -1;
 }
 
@@ -115,7 +113,7 @@ static int32_t sys_write(struct vfs_node_t * n, void * buf, uint64_t len)
 *---------------------------------------------------------------------
 *2022.10.03     1.0        刘杨
 **********************************************************************/
-static int16_t sys_ioctl(struct vfs_node_t * n, uint16_t cmd, void * buf)
+static int16_t sys_ioctl(struct vfs_node_t * n, uint16_t cmd, void *buf)
 {
 	struct kobj_t * kobj;
 
@@ -191,8 +189,9 @@ static int sys_lookup(struct vfs_node_t * dn, const char * name, struct vfs_node
 	obj = kobj_search(kobj, name);
 	if(!obj)
 		return -1;
-    
+
 	n->v_mode = 0;
+	n->v_size = obj->size;//寄存器寻址大小
 	n->v_data = (void *)obj;
 
 	if(obj->type == KOBJ_TYPE_DIR)
@@ -210,7 +209,7 @@ static int sys_lookup(struct vfs_node_t * dn, const char * name, struct vfs_node
 		if(obj->write)
 			n->v_mode |= S_IWUSR;
 		if(obj->ioctl)
-			n->v_mode |= S_IWUSR;
+			n->v_mode |= S_IXUSR;
 	}
 	return 0;
 }
@@ -220,7 +219,6 @@ static struct filesystem_t sys = {
 
 	.mount		= sys_mount,
 	.unmount	= sys_unmount,
-
 	.read		= sys_read,
 	.write		= sys_write,
 	.ioctl		= sys_ioctl,

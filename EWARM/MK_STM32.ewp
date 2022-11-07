@@ -32,7 +32,7 @@
                 </option>
                 <option>
                     <name>Input description</name>
-                    <state>Full formatting, without multibyte support.</state>
+                    <state>Automatic choice of formatter, without multibyte support.</state>
                 </option>
                 <option>
                     <name>Output description</name>
@@ -182,7 +182,7 @@
                 <option>
                     <name>OGScanfVariant</name>
                     <version>0</version>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>OGScanfMultibyteSupport</name>
@@ -297,7 +297,7 @@
                 <option>
                     <name>CCAllowList</name>
                     <version>1</version>
-                    <state>11111110</state>
+                    <state>00000000</state>
                 </option>
                 <option>
                     <name>CCDebugInfo</name>
@@ -370,6 +370,9 @@
                     <state>$PROJ_DIR$/../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2</state>
                     <state>$PROJ_DIR$/../Middlewares/Third_Party/FreeRTOS/Source/portable/IAR/ARM_CM4F</state>
                     <state>$PROJ_DIR$\..\MicroKernel\log</state>
+                    <state>$PROJ_DIR$\..\Board\driver\I2cSim</state>
+                    <state>$PROJ_DIR$\..\Board\device\ltc2944</state>
+                    <state>$PROJ_DIR$\..\Board\driver\i2c</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -385,7 +388,7 @@
                 </option>
                 <option>
                     <name>CCOptLevel</name>
-                    <state>3</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CCOptStrategy</name>
@@ -394,7 +397,7 @@
                 </option>
                 <option>
                     <name>CCOptLevelSlave</name>
-                    <state>3</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CompilerMisraRules98</name>
@@ -1075,9 +1078,15 @@
                 <name>Core</name>
                 <file>
                     <name>$PROJ_DIR$\..\Core\Src\adc_device.c</name>
+                    <excluded>
+                        <configuration>MK_STM32</configuration>
+                    </excluded>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\Core\Src\adc_driver.c</name>
+                    <excluded>
+                        <configuration>MK_STM32</configuration>
+                    </excluded>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\Core\Src\freertos.c</name>
@@ -1087,14 +1096,41 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\Core\Src\mk_gpio_dev.c</name>
+                    <excluded>
+                        <configuration>MK_STM32</configuration>
+                    </excluded>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\Core\Src\mk_gpio_drv.c</name>
+                    <excluded>
+                        <configuration>MK_STM32</configuration>
+                    </excluded>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\Core\Src\stm32f4xx_it.c</name>
                 </file>
             </group>
+        </group>
+    </group>
+    <group>
+        <name>Board</name>
+        <group>
+            <name>device</name>
+            <file>
+                <name>$PROJ_DIR$\..\Board\device\ltc2944\ltc2944.c</name>
+            </file>
+        </group>
+        <group>
+            <name>driver</name>
+            <file>
+                <name>$PROJ_DIR$\..\Board\driver\i2c\i2c.c</name>
+                <excluded>
+                    <configuration>MK_STM32</configuration>
+                </excluded>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Board\driver\I2cSim\I2cSim.c</name>
+            </file>
         </group>
     </group>
     <group>
@@ -1107,6 +1143,9 @@
         </group>
         <group>
             <name>STM32F4xx_HAL_Driver</name>
+            <file>
+                <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_gpio.c</name>
+            </file>
             <file>
                 <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_dma.c</name>
             </file>

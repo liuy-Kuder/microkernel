@@ -24,7 +24,7 @@
  ***************************/
 #define LVGL_VERSION_MAJOR 0
 #define LVGL_VERSION_MINOR 1
-#define LVGL_VERSION_PATCH 0
+#define LVGL_VERSION_PATCH 1
 #define LVGL_VERSION_INFO ""
 
 //is enable log
@@ -34,11 +34,10 @@
 
 #define ARRAY_SIZE(array)	( sizeof(array) / sizeof((array)[0]) )
 
-#define MICROKERNEL_MAX_DEVICES             (521)
+#define MICROKERNEL_MAX_DEVICES             (64)
 
-#define CONFIG_DEVICE_HASH_SIZE				(521)
-#define CONFIG_DRIVER_HASH_SIZE				(521)
-
+#define CONFIG_DEVICE_HASH_SIZE				(64)
+#define CONFIG_DRIVER_HASH_SIZE				(64)
 
 typedef enum { FALSE = 0, TRUE = 1 } boolean;
 
