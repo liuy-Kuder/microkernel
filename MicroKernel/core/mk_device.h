@@ -54,6 +54,7 @@ enum device_type_t {
 	DEVICE_TYPE_MAX_COUNT		= 44,
 };
 
+
 struct driver_t;
 struct device_t
 {
@@ -76,14 +77,13 @@ struct register_info_t{
 extern struct list_head __device_list;
 extern struct list_head __device_head[DEVICE_TYPE_MAX_COUNT];
 
-char * alloc_device_name(const char * name, int id);
-int free_device_name(char * name);
+char * alloc_device_name(const char * name, uint16_t id);
+uint8_t free_device_name(char * name);
 struct device_t * search_device(const char * name, enum device_type_t type);
 struct device_t * search_first_device(enum device_type_t type);
 uint16_t GetDeviceNum(void);
-int register_device(struct device_t * dev);
-int unregister_device(struct device_t * dev);
-void remove_device(struct device_t * dev);
+uint8_t register_device(struct device_t * dev);
+uint8_t unregister_device(struct device_t * dev);
 void device_pure_init(void);
 #ifdef __cplusplus
 }

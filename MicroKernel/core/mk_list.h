@@ -440,14 +440,6 @@ static inline void list_splice_tail_init(struct list_head * list,
  *
  * Note that if the list is empty, it returns NULL.
  */
-/*
-#define list_first_entry_or_null(ptr, type, member) ({ \
-	struct list_head * head__ = (ptr); \
-	struct list_head * pos__ = head__->next; \
-	pos__ != head__ ? list_entry(pos__, type, member) : NULL; \
-})
-*/
-
 #define list_first_entry_or_null(ptr, type, member) \
 	(struct list_head *)(((struct list_head *)ptr)->next) != (struct list_head *) ptr ? list_entry((struct list_head *)(((struct list_head *)ptr)->next), type, member) : NULL
 

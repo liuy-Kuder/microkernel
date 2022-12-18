@@ -20,7 +20,6 @@ struct list_head __filesystem_list = {
 
 static struct kobj_t * search_class_filesystem_kobj(void)
 {
-	//struct kobj_t * kclass = kobj_search_directory_with_create(kobj_get_root(), "class");
 	return kobj_search_directory_with_create(kobj_get_root(), "filesystem");
 }
 
@@ -29,23 +28,23 @@ struct filesystem_t * search_filesystem(const char * name)
 	struct filesystem_t * pos, * n;
 
 	if(!name)
-		return NULL;
+	  return NULL;
 
 	list_for_each_entry_safe(pos, n,struct filesystem_t, &__filesystem_list, list)
-	{
+	 {
 		if(strcmp(pos->name, name) == 0)
-			return pos;
-	}
+		  return pos;
+	 }
 	return NULL;
 }
 
 uint8_t register_filesystem(struct filesystem_t * fs)
 {
 	if(!fs || !fs->name)
-		return FALSE;
+	  return FALSE;
 
 	if(search_filesystem(fs->name))
-		return FALSE;
+	  return FALSE;
 
 	fs->kobj = kobj_alloc_directory(fs->name); 
 	kobj_add(search_class_filesystem_kobj(), fs->kobj);
@@ -59,7 +58,7 @@ uint8_t register_filesystem(struct filesystem_t * fs)
 uint8_t unregister_filesystem(struct filesystem_t * fs)
 {
 	if(!fs || !fs->name)
-		return FALSE;
+	 return FALSE;
 
 	spin_lock_irq();
 	list_del(&fs->list);
@@ -71,26 +70,28 @@ uint8_t unregister_filesystem(struct filesystem_t * fs)
 }
 
 struct vfs_file_t {
-#ifdef USE_FREERTOS
-	SemaphoreHandle_t f_lock;
-#endif
-#ifdef USE_THREADX
-	TX_MUTEX f_lock;
+#ifdef USE_OS
+	#ifdef USE_FREERTOS
+		SemaphoreHandle_t f_lock;
+	#elif #define USE_THREADX
+		TX_MUTEX f_lock;
+	#endif
 #endif
 	struct vfs_node_t * f_node;
 	size_t f_offset;
 	uint32_t f_flags;
 };
 
-#ifdef USE_FREERTOS
-	SemaphoreHandle_t mnt_list_lock;
-	SemaphoreHandle_t fd_file_lock;
-	SemaphoreHandle_t node_list_lock[VFS_NODE_HASH_SIZE];
-#endif
-#ifdef USE_THREADX
-	TX_MUTEX mnt_list_lock;
-	TX_MUTEX fd_file_lock;
-	TX_MUTEX node_list_lock[VFS_NODE_HASH_SIZE];
+#ifdef USE_OS
+	#ifdef USE_FREERTOS
+		SemaphoreHandle_t mnt_list_lock;
+		SemaphoreHandle_t fd_file_lock;
+		SemaphoreHandle_t node_list_lock[VFS_NODE_HASH_SIZE];
+	#elif #define USE_THREADX
+		TX_MUTEX mnt_list_lock;
+		TX_MUTEX fd_file_lock;
+		TX_MUTEX node_list_lock[VFS_NODE_HASH_SIZE];
+	#endif
 #endif
 static struct list_head mnt_list;
 static struct vfs_file_t fd_file[VFS_MAX_FD];
@@ -874,7 +875,7 @@ int vfs_close(int fd)
 	return 0;
 }
 
-size_t vfs_lseek(int fd, size_t offset, int whence)
+int64_t vfs_lseek(int fd, int64_t offset, int whence)
 {
 	struct vfs_node_t * n;
 	struct vfs_file_t * f;
@@ -899,9 +900,9 @@ size_t vfs_lseek(int fd, size_t offset, int whence)
 	{
 	case VFS_SEEK_SET:
 		if(offset < 0)
-			offset = 0;
+		  offset = 0;
 		else if(offset > n->v_size)
-			offset = n->v_size;
+		  offset = n->v_size;
 		break;
 
 	case VFS_SEEK_CUR:
@@ -946,7 +947,7 @@ size_t vfs_lseek(int fd, size_t offset, int whence)
 }
 
 //文件节点的读取
-size_t vfs_read(int fd, void * buf, size_t len)
+int64_t vfs_read(int fd, void * buf, int64_t len)
 {
 	struct vfs_node_t * n;
 	struct vfs_file_t * f;
@@ -997,7 +998,8 @@ size_t vfs_read(int fd, void * buf, size_t len)
 	mutex_lock(n->v_lock);
 #endif
     ret = n->v_mount->m_fs->read(n, f->f_offset, buf, len);
-	f->f_offset += ret;
+	if(ret > 0)
+	  f->f_offset += ret;
 #ifdef USE_OS
 	mutex_unlock(n->v_lock);
 	mutex_unlock(f->f_lock);
@@ -1006,11 +1008,11 @@ size_t vfs_read(int fd, void * buf, size_t len)
 }
 
 //文件节点的写入
-size_t vfs_write(int fd, void * buf, size_t len)
+int64_t vfs_write(int fd, void * buf, int64_t len)
 {
 	struct vfs_node_t * n;
 	struct vfs_file_t * f;
-	size_t ret = 0;
+	int64_t ret = 0;
 
 	if(!buf || !len)
 	 {
@@ -1057,7 +1059,8 @@ size_t vfs_write(int fd, void * buf, size_t len)
 	mutex_lock(n->v_lock);
 #endif
 	ret = n->v_mount->m_fs->write(n, f->f_offset, buf, len);
-	f->f_offset += ret;
+	if(ret > 0)
+	 f->f_offset += ret;
 #ifdef USE_OS
 	mutex_unlock(n->v_lock);
 	mutex_unlock(f->f_lock);
@@ -1066,7 +1069,7 @@ size_t vfs_write(int fd, void * buf, size_t len)
 }
 
 //文件节点的读取
-int16_t vfs_ioctl(int fd, uint16_t cmd,void *buf)
+int64_t vfs_ioctl(int fd, uint64_t cmd,void *buf)
 {
 	struct vfs_node_t * n;
 	struct vfs_file_t * f;

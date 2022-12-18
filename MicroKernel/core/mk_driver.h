@@ -21,14 +21,14 @@ struct driver_t
 	struct hlist_node node;
 	char *name;
 	int (*probe)(struct driver_t * drv,struct driver_info_t * drv_info);
-	int (*remove)(struct device_t * dev);
+	int (*remove)(struct driver_t * dev,struct driver_info_t * drv_info);
 	int (*suspend)(struct device_t * dev);
 	int (*resume)(struct device_t * dev);
 };
 
 struct driver_t * search_driver(const char * name);
-int register_driver(struct driver_t * drv);
-int unregister_driver(struct driver_t * drv);
+uint8_t register_driver(struct driver_t * drv);
+uint8_t unregister_driver(struct driver_t * drv);
 void driver_pure_init(void);
 
 #ifdef __cplusplus

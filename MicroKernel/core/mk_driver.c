@@ -1,7 +1,7 @@
 /********************************************************************
 *
 *文件名称：mk_driver.c
-*内容摘要：提供总线读写平台
+*内容摘要：提供驱动管理平台
 *当前版本：V1.0
 *作者：刘杨
 *完成时期：2022.09.12
@@ -49,12 +49,12 @@ struct driver_t * search_driver(const char * name)
 	struct hlist_node * n;
 
 	if(!name)
-		return NULL;
+	  return NULL;
 
     hlist_for_each_entry_safe(pos, struct driver_t, n, driver_hash(name), node)
 	{
 		if(strcmp(pos->name, name) == 0)
-			return pos;
+		  return pos;
 	}
 	return NULL;
 }
@@ -69,29 +69,29 @@ struct driver_t * search_driver(const char * name)
 *---------------------------------------------------------------------
 *2022.9.12     1.0        刘杨
 **********************************************************************/
-int register_driver(struct driver_t * drv)
+uint8_t register_driver(struct driver_t * drv)
 {
 	if(!drv || !drv->name)//空或无名字、返回假
 	 {
-		MK_LOG_ERROR("%s register driver null or name null!",drv->name);
+		MK_LOG_ERROR("%s register driver null or name null!\n",drv->name);
 		return FALSE;
 	 }
 
 	if(!drv->probe || !drv->remove)//无管道或无移除、返回假
 	 {
-		MK_LOG_ERROR("%s register driver no probe or remove!",drv->name);
+		MK_LOG_ERROR("%s register driver no probe or remove!\n",drv->name);
 		return FALSE;
 	 }
 
 	if(!drv->suspend || !drv->resume)//无暂停或无释放、返回假
 	 {
-		MK_LOG_ERROR("%s register driver no suspend or resume!",drv->name);
+		MK_LOG_ERROR("%s register driver no suspend or resume!\n",drv->name);
 		return FALSE;
 	 }
 
 	if(search_driver(drv->name))//寻找驱动名，如果相同则返回假
 	 {
-		MK_LOG_ERROR("%s register driver have same name!",drv->name);
+		MK_LOG_ERROR("%s register driver have same name!\n",drv->name);
 		return FALSE;
 	 }
 
@@ -102,7 +102,7 @@ int register_driver(struct driver_t * drv)
 	init_hlist_node(&drv->node);
 	hlist_add_head(&drv->node, driver_hash(drv->name));
 	spin_unlock_irq();//开中断
-	MK_LOG_TRACE("%s register driver success!",drv->name);
+	MK_LOG_TRACE("%s register driver success!\n",drv->name);
 	return TRUE;
 }
 
@@ -116,17 +116,17 @@ int register_driver(struct driver_t * drv)
 *---------------------------------------------------------------------
 *2022.9.12     1.0        刘杨
 **********************************************************************/
-int unregister_driver(struct driver_t * drv)
+uint8_t unregister_driver(struct driver_t * drv)
 {
 	if(!drv || !drv->name)
 	 {
-		MK_LOG_ERROR("%s unregister driver null or name null!",drv->name);
+		MK_LOG_ERROR("%s unregister driver null or name null!\n",drv->name);
 		return FALSE;
 	 }
 
 	if(hlist_unhashed(&drv->node))
 	 {
-		MK_LOG_ERROR("%s unregister driver node is null!",drv->name);
+		MK_LOG_ERROR("%s unregister driver node is null!\n",drv->name);
 		return FALSE;
 	 }
 
@@ -134,13 +134,13 @@ int unregister_driver(struct driver_t * drv)
 	hlist_del(&drv->node);
 	spin_unlock_irq();
 	kobj_remove_self(drv->kobj);
-	MK_LOG_TRACE("%s unregister driver success!",drv->name);
+	MK_LOG_TRACE("%s unregister driver success!\n",drv->name);
 	return TRUE;
 }
 
 /********************************************************************
 *                      功能函数
-*功能描述：初始化设备列表
+*功能描述：初始化驱动池
 *输入参数：无
 *返回值：无
 *其他说明：无
@@ -152,5 +152,5 @@ void driver_pure_init(void)
 {
 	uint16_t i;
 	for(i = 0; i < ARRAY_SIZE(__driver_hash); i++)
-		init_hlist_head(&__driver_hash[i]);
+	 init_hlist_head(&__driver_hash[i]);
 }

@@ -106,11 +106,12 @@ struct vfs_node_t {
 	char v_path[VFS_MAX_PATH];
 	enum vfs_node_flag_t v_flags;
 	enum vfs_node_type_t v_type;
-#ifdef USE_FREERTOS
-	SemaphoreHandle_t v_lock;
-#endif
-#ifdef USE_THREADX
-	TX_MUTEX v_lock;
+#ifdef USE_OS
+	#ifdef USE_FREERTOS
+		SemaphoreHandle_t v_lock;
+	#elif #define USE_THREADX
+		TX_MUTEX v_lock;
+	#endif
 #endif
 	uint16_t v_mode;
 	size_t v_size;
@@ -130,11 +131,12 @@ struct vfs_mount_t {
 	uint32_t m_flags;
 	struct vfs_node_t * m_root;
 	struct vfs_node_t * m_covered;
-#ifdef USE_FREERTOS
-	SemaphoreHandle_t m_lock;
-#endif
-#ifdef USE_THREADX
-	TX_MUTEX m_lock;
+#ifdef USE_OS
+	#ifdef USE_FREERTOS
+		SemaphoreHandle_t m_lock;
+	#elif #define USE_THREADX
+		TX_MUTEX m_lock;
+	#endif
 #endif
 	void * m_data;
 };
@@ -145,9 +147,9 @@ struct filesystem_t {
 	const char * name;
     int (*mount)(struct vfs_mount_t *, const char *);
 	int (*unmount)(struct vfs_mount_t *);
-    size_t (*read)(struct vfs_node_t *, size_t, void *, size_t);
-	size_t (*write)(struct vfs_node_t *, size_t, void *, size_t);
-	int16_t (*ioctl)(struct vfs_node_t *, uint16_t, void *);
+    int64_t (*read)(struct vfs_node_t *, int64_t, void *, int64_t);
+	int64_t (*write)(struct vfs_node_t *, int64_t, void *, int64_t);
+	int64_t (*ioctl)(struct vfs_node_t *, uint64_t, void *);
 	int (*readdir)(struct vfs_node_t *, int64_t, struct vfs_dirent_t *);
 	int (*lookup)(struct vfs_node_t *, const char *, struct vfs_node_t *);
 };
@@ -165,10 +167,10 @@ struct vfs_mount_t * vfs_mount_get(int index);
 int vfs_mount_count(void);
 int vfs_open(const char * path, uint32_t flags);
 int vfs_close(int fd);
-size_t vfs_lseek(int fd, size_t offset, int whence);
-size_t vfs_read(int fd, void * buf, size_t len);
-size_t vfs_write(int fd, void * buf, size_t len);
-int16_t vfs_ioctl(int fd, uint16_t cmd, void *buf);
+int64_t vfs_lseek(int fd, int64_t offset, int whence);
+int64_t vfs_read(int fd, void * buf, int64_t len);
+int64_t vfs_write(int fd, void * buf, int64_t len);
+int64_t vfs_ioctl(int fd, uint64_t cmd, void *buf);
 int vfs_fstat(int fd, struct vfs_stat_t * st);
 int vfs_opendir(const char * name);
 int vfs_closedir(int fd);
@@ -177,9 +179,7 @@ int vfs_rewinddir(int fd);
 int vfs_unlink(const char * path);
 int vfs_access(const char * path, uint32_t mode);
 int vfs_stat(const char * path, struct vfs_stat_t * st);
-
 void do_init_vfs(void);
-
 void do_auto_mount(void);
 
 #ifdef __cplusplus

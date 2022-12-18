@@ -1,7 +1,7 @@
 /********************************************************************
 *
 *文件名称：mk_device.c
-*内容摘要：提供总线读写平台
+*内容摘要：提供设备管理平台
 *当前版本：V1.0
 *作者：刘杨
 *完成时期：2022.09.12
@@ -38,149 +38,149 @@ static struct kobj_t * search_device_kobj(struct device_t * dev)
 	char * name;
 
 	if(!dev || !dev->kobj)
-		return NULL;
+	  return NULL;
 
 	kdevice = kobj_search_directory_with_create(kobj_get_root(), "device");
 	if(!kdevice)
-		return NULL;
+	  return NULL;
 
 	switch(dev->type)
-	{
-	case DEVICE_TYPE_ADC:
-		name = "adc";
-		break;
-	case DEVICE_TYPE_AUDIO:
-		name = "audio";
-		break;
-	case DEVICE_TYPE_BATTERY:
-		name = "battery";
-		break;
-	case DEVICE_TYPE_BLOCK:
-		name = "block";
-		break;
-	case DEVICE_TYPE_BUZZER:
-		name = "buzzer";
-		break;
-	case DEVICE_TYPE_CAMERA:
-		name = "camera";
-		break;
-	case DEVICE_TYPE_CLK:
-		name = "clk";
-		break;
-	case DEVICE_TYPE_CLOCKEVENT:
-		name = "clockevent";
-		break;
-	case DEVICE_TYPE_CLOCKSOURCE:
-		name = "clocksource";
-		break;
-	case DEVICE_TYPE_COMPASS:
-		name = "compass";
-		break;
-	case DEVICE_TYPE_CONSOLE:
-		name = "console";
-		break;
-	case DEVICE_TYPE_DAC:
-		name = "dac";
-		break;
-	case DEVICE_TYPE_DMACHIP:
-		name = "dmachip";
-		break;
-	case DEVICE_TYPE_FRAMEBUFFER:
-		name = "framebuffer";
-		break;
-	case DEVICE_TYPE_GMETER:
-		name = "gmeter";
-		break;
-	case DEVICE_TYPE_GNSS:
-		name = "gnss";
-		break;
-	case DEVICE_TYPE_GPIOCHIP:
-		name = "gpiochip";
-		break;
-	case DEVICE_TYPE_GYROSCOPE:
-		name = "gyroscope";
-		break;
-	case DEVICE_TYPE_HYGROMETER:
-		name = "hygrometer";
-		break;
-	case DEVICE_TYPE_I2C:
-		name = "i2c";
-		break;
-	case DEVICE_TYPE_INPUT:
-		name = "input";
-		break;
-	case DEVICE_TYPE_IRQCHIP:
-		name = "irqchip";
-		break;
-	case DEVICE_TYPE_LED:
-		name = "led";
-		break;
-	case DEVICE_TYPE_LEDSTRIP:
-		name = "ledstrip";
-		break;
-	case DEVICE_TYPE_LEDTRIGGER:
-		name = "ledtrigger";
-		break;
-	case DEVICE_TYPE_LIGHT:
-		name = "light";
-		break;
-	case DEVICE_TYPE_MOTOR:
-		name = "motor";
-		break;
-	case DEVICE_TYPE_NET:
-		name = "net";
-		break;
-	case DEVICE_TYPE_NVMEM:
-		name = "nvmem";
-		break;
-	case DEVICE_TYPE_PRESSURE:
-		name = "pressure";
-		break;
-	case DEVICE_TYPE_PROXIMITY:
-		name = "proximity";
-		break;
-	case DEVICE_TYPE_PWM:
-		name = "pwm";
-		break;
-	case DEVICE_TYPE_REGULATOR:
-		name = "regulator";
-		break;
-	case DEVICE_TYPE_RESETCHIP:
-		name = "resetchip";
-		break;
-	case DEVICE_TYPE_RNG:
-		name = "rng";
-		break;
-	case DEVICE_TYPE_RTC:
-		name = "rtc";
-		break;
-	case DEVICE_TYPE_SDHCI:
-		name = "sdhci";
-		break;
-	case DEVICE_TYPE_SERVO:
-		name = "servo";
-		break;
-	case DEVICE_TYPE_SPI:
-		name = "spi";
-		break;
-	case DEVICE_TYPE_STEPPER:
-		name = "stepper";
-		break;
-	case DEVICE_TYPE_THERMOMETER:
-		name = "thermometer";
-		break;
-	case DEVICE_TYPE_UART:
-		name = "uart";
-		break;
-	case DEVICE_TYPE_VIBRATOR:
-		name = "vibrator";
-		break;
-	case DEVICE_TYPE_WATCHDOG:
-		name = "watchdog";
-		break;
-	default:
-		return NULL;
-	}
+	  {
+		case DEVICE_TYPE_ADC:
+			name = "adc";
+			break;
+		case DEVICE_TYPE_AUDIO:
+			name = "audio";
+			break;
+		case DEVICE_TYPE_BATTERY:
+			name = "battery";
+			break;
+		case DEVICE_TYPE_BLOCK:
+			name = "block";
+			break;
+		case DEVICE_TYPE_BUZZER:
+			name = "buzzer";
+			break;
+		case DEVICE_TYPE_CAMERA:
+			name = "camera";
+			break;
+		case DEVICE_TYPE_CLK:
+			name = "clk";
+			break;
+		case DEVICE_TYPE_CLOCKEVENT:
+			name = "clockevent";
+			break;
+		case DEVICE_TYPE_CLOCKSOURCE:
+			name = "clocksource";
+			break;
+		case DEVICE_TYPE_COMPASS:
+			name = "compass";
+			break;
+		case DEVICE_TYPE_CONSOLE:
+			name = "console";
+			break;
+		case DEVICE_TYPE_DAC:
+			name = "dac";
+			break;
+		case DEVICE_TYPE_DMACHIP:
+			name = "dmachip";
+			break;
+		case DEVICE_TYPE_FRAMEBUFFER:
+			name = "framebuffer";
+			break;
+		case DEVICE_TYPE_GMETER:
+			name = "gmeter";
+			break;
+		case DEVICE_TYPE_GNSS:
+			name = "gnss";
+			break;
+		case DEVICE_TYPE_GPIOCHIP:
+			name = "gpiochip";
+			break;
+		case DEVICE_TYPE_GYROSCOPE:
+			name = "gyroscope";
+			break;
+		case DEVICE_TYPE_HYGROMETER:
+			name = "hygrometer";
+			break;
+		case DEVICE_TYPE_I2C:
+			name = "i2c";
+			break;
+		case DEVICE_TYPE_INPUT:
+			name = "input";
+			break;
+		case DEVICE_TYPE_IRQCHIP:
+			name = "irqchip";
+			break;
+		case DEVICE_TYPE_LED:
+			name = "led";
+			break;
+		case DEVICE_TYPE_LEDSTRIP:
+			name = "ledstrip";
+			break;
+		case DEVICE_TYPE_LEDTRIGGER:
+			name = "ledtrigger";
+			break;
+		case DEVICE_TYPE_LIGHT:
+			name = "light";
+			break;
+		case DEVICE_TYPE_MOTOR:
+			name = "motor";
+			break;
+		case DEVICE_TYPE_NET:
+			name = "net";
+			break;
+		case DEVICE_TYPE_NVMEM:
+			name = "nvmem";
+			break;
+		case DEVICE_TYPE_PRESSURE:
+			name = "pressure";
+			break;
+		case DEVICE_TYPE_PROXIMITY:
+			name = "proximity";
+			break;
+		case DEVICE_TYPE_PWM:
+			name = "pwm";
+			break;
+		case DEVICE_TYPE_REGULATOR:
+			name = "regulator";
+			break;
+		case DEVICE_TYPE_RESETCHIP:
+			name = "resetchip";
+			break;
+		case DEVICE_TYPE_RNG:
+			name = "rng";
+			break;
+		case DEVICE_TYPE_RTC:
+			name = "rtc";
+			break;
+		case DEVICE_TYPE_SDHCI:
+			name = "sdhci";
+			break;
+		case DEVICE_TYPE_SERVO:
+			name = "servo";
+			break;
+		case DEVICE_TYPE_SPI:
+			name = "spi";
+			break;
+		case DEVICE_TYPE_STEPPER:
+			name = "stepper";
+			break;
+		case DEVICE_TYPE_THERMOMETER:
+			name = "thermometer";
+			break;
+		case DEVICE_TYPE_UART:
+			name = "uart";
+			break;
+		case DEVICE_TYPE_VIBRATOR:
+			name = "vibrator";
+			break;
+		case DEVICE_TYPE_WATCHDOG:
+			name = "watchdog";
+			break;
+		default:
+			return NULL;
+	  }
 
 	return kobj_search_directory_with_create(kdevice, (const char *)name);
 }
@@ -198,11 +198,11 @@ static struct kobj_t * search_device_kobj(struct device_t * dev)
 static void suspend_device(struct device_t * dev)
 {
 	if(dev)
-	{
+	 {
 		if(dev->driver && dev->driver->suspend)
-			dev->driver->suspend(dev);
-		MK_LOG_TRACE("%s suspend device success!",dev->name);
-	}
+		  dev->driver->suspend(dev);
+		MK_LOG_TRACE("%s suspend device success!\n",dev->name);
+	 }
 }
 
 /********************************************************************
@@ -220,10 +220,11 @@ static void resume_device(struct device_t * dev)
 	if(dev)
 	 {
 		if(dev->driver && dev->driver->resume)
-			dev->driver->resume(dev);
-		MK_LOG_TRACE("%s resume device success!",dev->name);
+		  dev->driver->resume(dev);
+		MK_LOG_TRACE("%s resume device success!\n",dev->name);
 	 }
 }
+
 /********************************************************************
 *                      功能函数
 *功能描述： 驱动写暂停
@@ -237,7 +238,7 @@ static void resume_device(struct device_t * dev)
 *---------------------------------------------------------------------
 *2022.9.12     1.0        刘杨
 **********************************************************************/
-static size_t device_write_suspend(struct kobj_t * kobj, size_t offset, void * buf, size_t size)
+static int64_t device_write_suspend(struct kobj_t * kobj, int64_t offset, void * buf, int64_t size)
 {
 	int ret = 0;
 	struct device_t * dev = (struct device_t *)kobj->priv;
@@ -260,7 +261,7 @@ static size_t device_write_suspend(struct kobj_t * kobj, size_t offset, void * b
 *---------------------------------------------------------------------
 *2022.9.12     1.0        刘杨
 **********************************************************************/
-static size_t device_write_resume(struct kobj_t * kobj,size_t offset, void * buf, size_t size)
+static int64_t device_write_resume(struct kobj_t * kobj,int64_t offset, void * buf, int64_t size)
 {
 	int ret = 0;
 	struct device_t * dev = (struct device_t *)kobj->priv;
@@ -286,10 +287,10 @@ static uint8_t device_exist(const char * name)
 	struct hlist_node * n;
 
 	hlist_for_each_entry_safe(pos, struct device_t, n, device_hash(name), node)
-	{
+	 {
 		if(strcmp(pos->name, name) == 0)
-			return TRUE;
-	}
+		  return TRUE;
+	 }
 	return FALSE;
 }
 
@@ -303,12 +304,10 @@ static uint8_t device_exist(const char * name)
 *---------------------------------------------------------------------
 *2022.9.12     1.0        刘杨
 **********************************************************************/
-char * alloc_device_name(const char * name, int id)
+char * alloc_device_name(const char * name, uint16_t id)
 {
 	char buf[256];
 
-	if(id < 0)
-		id = 0;
 	do {
 		snprintf(buf, sizeof(buf), "%s.%d", name, id++);
 	} while(device_exist(buf));
@@ -320,21 +319,22 @@ char * alloc_device_name(const char * name, int id)
 *                      功能函数
 *功能描述：释放设备的名称
 *输入参数：名字
-*返回值：MK_OK 或 MK_ERROR
+*返回值：FALSE or TRUE
 *其他说明：无
 *修改日期       版本      修改人        修改内容
 *---------------------------------------------------------------------
 *2022.9.12     1.0        刘杨
+*2022.12.17    1.1        刘杨         修改返回值
 **********************************************************************/
-int free_device_name(char * name)
+uint8_t free_device_name(char * name)
 {
 	if(name)
 	 {
 		MK_FREE(name);
-		return FALSE;
+		return TRUE;
 	 }
 	else
-	 return TRUE;
+	 return FALSE;
 }
 
 /********************************************************************
@@ -354,13 +354,13 @@ struct device_t * search_device(const char * name, enum device_type_t type)
 	struct hlist_node * n;
 
 	if(!name)
-		return NULL;
+	  return NULL;
 
 	hlist_for_each_entry_safe(pos, struct device_t, n, device_hash(name), node)
-	{
+	 {
 		if((pos->type == type) && (strcmp(pos->name, name) == 0))
-			return pos;
-	}
+		  return pos;
+	 }
 	return NULL;
 }
 
@@ -377,7 +377,7 @@ struct device_t * search_device(const char * name, enum device_type_t type)
 struct device_t * search_first_device(enum device_type_t type)
 {
 	if(type >= ARRAY_SIZE(__device_head))
-			return NULL;
+	  return NULL;
 
 	void * pos = list_first_entry_or_null(&__device_head[type], struct device_t, head);
 	return (struct device_t *) pos;
@@ -393,10 +393,10 @@ struct device_t * search_first_device(enum device_type_t type)
 *---------------------------------------------------------------------
 *2022.10.6     1.0        刘杨
 **********************************************************************/
-static uint16_t cnt = 0;
+static uint16_t decive_cnt = 0;
 static void device_inc(void)
 {
-	cnt++;
+	decive_cnt++;
 }
 
 /********************************************************************
@@ -411,8 +411,9 @@ static void device_inc(void)
 **********************************************************************/
 static void device_dec(void)
 {
-	cnt--;
+	decive_cnt--;
 }
+
 /********************************************************************
 *                      功能函数
 *功能描述：获得device的数量
@@ -425,8 +426,9 @@ static void device_dec(void)
 **********************************************************************/
 uint16_t GetDeviceNum(void)
 {
-	return cnt;
+	return decive_cnt;
 }
+
 /********************************************************************
 *                      功能函数
 *功能描述：注册设备
@@ -437,23 +439,23 @@ uint16_t GetDeviceNum(void)
 *---------------------------------------------------------------------
 *2022.9.12      1.0       刘杨
 **********************************************************************/
-int register_device(struct device_t * dev)
+uint8_t register_device(struct device_t * dev)
 {
 	if(!dev || !dev->name)
 	 {
-		MK_LOG_ERROR("%s register device null or name null!",dev->name);
+		MK_LOG_ERROR("%s register device null or name null!\n",dev->name);
 		return FALSE;
 	 }
 		
     if(dev->type >= ARRAY_SIZE(__device_head))
 	 {
-		MK_LOG_ERROR("%s register device type over index!",dev->name);
+		MK_LOG_ERROR("%s register device type over index!\n",dev->name);
 		return FALSE;
 	 }
 
 	if(device_exist(dev->name))
 	 {
-		MK_LOG_ERROR("%s register device have existing!",dev->name);
+		MK_LOG_ERROR("%s register device have existing!\n",dev->name);
 		return FALSE;
 	 }
 
@@ -483,23 +485,23 @@ int register_device(struct device_t * dev)
 *---------------------------------------------------------------------
 *2022.9.12      1.0       刘杨
 **********************************************************************/
-int unregister_device(struct device_t * dev)
+uint8_t unregister_device(struct device_t * dev)
 {
 	if(!dev || !dev->name)
 	 {
-		MK_LOG_ERROR("%s unregister device null or name null!",dev->name);
+		MK_LOG_ERROR("%s unregister device null or name null!\n",dev->name);
 		return FALSE;
 	 }
 
     if(dev->type >= ARRAY_SIZE(__device_head))
 	 {
-		MK_LOG_ERROR("%s unregister device type over index!",dev->name);
+		MK_LOG_ERROR("%s unregister device type over index!\n",dev->name);
 		return FALSE;
 	 }
 
 	if(hlist_unhashed(&dev->node))
 	 {
-		MK_LOG_ERROR("%s unregister device fail!",dev->name);
+		MK_LOG_ERROR("%s unregister device fail!\n",dev->name);
 		return FALSE;
 	 }
 
@@ -509,30 +511,14 @@ int unregister_device(struct device_t * dev)
 	hlist_del(&dev->node);
 	spin_unlock_irq();
 	kobj_remove(search_device_kobj(dev), dev->kobj);
-	MK_LOG_TRACE("%s unregister device success!",dev->name);
+	MK_LOG_TRACE("%s unregister device success!\n",dev->name);
 	device_dec();
 	return TRUE;
 }
 
 /********************************************************************
 *                      功能函数
-*功能描述：移除设备
-*输入参数：无
-*返回值：无
-*其他说明：无
-*修改日期       版本      修改人        修改内容
-*---------------------------------------------------------------------
-*2022.9.12     1.0        刘杨
-**********************************************************************/
-void remove_device(struct device_t * dev)
-{
-	if(dev && dev->driver && dev->driver->remove)
-		dev->driver->remove(dev);
-}
-
-/********************************************************************
-*                      功能函数
-*功能描述：设备列表初始化
+*功能描述：初始化设备池
 *输入参数：无
 *返回值：无
 *其他说明：无
@@ -542,11 +528,11 @@ void remove_device(struct device_t * dev)
 **********************************************************************/
 void device_pure_init(void)
 {
-	int i;
+	uint16_t i;
 
 	init_list_head(&__device_list);
 	for(i = 0; i < ARRAY_SIZE(__device_head); i++)
-		init_list_head(&__device_head[i]);
+	  init_list_head(&__device_head[i]);
 	for(i = 0; i < ARRAY_SIZE(__device_hash); i++)
-		init_hlist_head(&__device_hash[i]);
+	  init_hlist_head(&__device_hash[i]);
 }

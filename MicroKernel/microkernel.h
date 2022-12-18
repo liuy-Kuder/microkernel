@@ -17,14 +17,12 @@
 
 #include "rtos.h"
 
-//#include "cmsis_iccarm.h"
-
 /***************************
  * CURRENT VERSION OF LVGL
  ***************************/
 #define LVGL_VERSION_MAJOR 0
 #define LVGL_VERSION_MINOR 1
-#define LVGL_VERSION_PATCH 1
+#define LVGL_VERSION_PATCH 2
 #define LVGL_VERSION_INFO ""
 
 //is enable log
@@ -40,5 +38,4 @@
 #define CONFIG_DRIVER_HASH_SIZE				(64)
 
 typedef enum { FALSE = 0, TRUE = 1 } boolean;
-
 #endif

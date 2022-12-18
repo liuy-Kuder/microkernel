@@ -28,7 +28,7 @@ void mk_log_register_print_cb(mk_log_print_g_cb_t print_cb)
 {
     custom_print_cb = print_cb;
 }
-//uint8_t myuserinfo[1025];
+
 /**
  * Add a log
  * @param level the level of log. (From `mk_log_level_t` enum)

@@ -64,16 +64,17 @@ static int sys_unmount(struct vfs_mount_t * m)
 *---------------------------------------------------------------------
 *2022.10.03     1.0        刘杨
 **********************************************************************/
-static size_t sys_read(struct vfs_node_t * n, size_t offset, void * buf, size_t len)
+static int64_t sys_read(struct vfs_node_t * n, int64_t offset, void * buf, int64_t len)
 {
 	struct kobj_t * kobj;
-
+	if(offset < 0)//不支持负数
+	  return -1;
 	if(n->v_type != VNT_REG)
-		return -1;
+	  return -2;
 	kobj = n->v_data;
 	if(kobj && kobj->read)
 	  return kobj->read(kobj, offset, buf, len);
-	return -1;
+	return -3;
 }
 
 /********************************************************************
@@ -89,16 +90,17 @@ static size_t sys_read(struct vfs_node_t * n, size_t offset, void * buf, size_t 
 *---------------------------------------------------------------------
 *2022.10.03     1.0        刘杨
 **********************************************************************/
-static size_t sys_write(struct vfs_node_t * n, size_t offset, void * buf, size_t len)
+static int64_t sys_write(struct vfs_node_t * n, int64_t offset, void * buf, int64_t len)
 {
 	struct kobj_t * kobj;
-
+	if(offset < 0)//不支持负数
+	  return -1;
 	if(n->v_type != VNT_REG)
-		return -1;
+		return -2;
 	kobj = n->v_data;
 	if(kobj && kobj->write)
 	  return kobj->write(kobj, offset, buf, len);
-	return -1;
+	return -3;
 }
 
 /********************************************************************
@@ -113,7 +115,7 @@ static size_t sys_write(struct vfs_node_t * n, size_t offset, void * buf, size_t
 *---------------------------------------------------------------------
 *2022.10.03     1.0        刘杨
 **********************************************************************/
-static int16_t sys_ioctl(struct vfs_node_t * n, uint16_t cmd, void *buf)
+static int64_t sys_ioctl(struct vfs_node_t * n, uint64_t cmd, void *buf)
 {
 	struct kobj_t * kobj;
 
@@ -145,21 +147,21 @@ static int sys_readdir(struct vfs_node_t * dn, int64_t off, struct vfs_dirent_t 
 
 	kobj = dn->v_data;
 	if(list_empty(&kobj->children))
-		return -1;
+	 return -1;
 
 	pos = (&kobj->children)->next;
 	for(i = 0; i != off; i++)
-	{
+	 {
 		pos = pos->next;
 		if(pos == (&kobj->children))
-			return -1;
-	}
+		  return -1;
+	 }
 
 	obj = list_entry(pos, struct kobj_t, entry);
 	if(obj->type == KOBJ_TYPE_DIR)
-		d->d_type = VDT_DIR;
+	  d->d_type = VDT_DIR;
 	else
-		d->d_type = VDT_REG;
+	  d->d_type = VDT_REG;
 	strncpy(d->d_name, obj->name, sizeof(d->d_name));
 	d->d_off = off;
 	d->d_reclen = 1;
@@ -183,34 +185,34 @@ static int sys_lookup(struct vfs_node_t * dn, const char * name, struct vfs_node
 	struct kobj_t * kobj, * obj;
 
 	if(*name == '\0')
-		return -1;
+	 return -1;
 
 	kobj = dn->v_data;
 	obj = kobj_search(kobj, name);
 	if(!obj)
-		return -1;
+	 return -1;
 
 	n->v_mode = 0;
 	n->v_size = obj->size;//寄存器寻址大小
 	n->v_data = (void *)obj;
 
 	if(obj->type == KOBJ_TYPE_DIR)
-	{
+	 {
 		n->v_type = VNT_DIR;
 		n->v_mode |= S_IFDIR;
 		n->v_mode |= S_IRWXU;
-	}
+	 }
 	else
-	{
+	 {
 		n->v_type = VNT_REG;
 		n->v_mode |= S_IFREG;
 		if(obj->read)
-			n->v_mode |= S_IRUSR;
+		  n->v_mode |= S_IRUSR;
 		if(obj->write)
-			n->v_mode |= S_IWUSR;
+		  n->v_mode |= S_IWUSR;
 		if(obj->ioctl)
-			n->v_mode |= S_IXUSR;
-	}
+		  n->v_mode |= S_IXUSR;
+	 }
 	return 0;
 }
 

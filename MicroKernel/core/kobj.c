@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "microkernel.h"
+#include "rtos.h"
+#include "../log/mk_log.h"
 
 static struct kobj_t * __kobj_root = NULL;
 
@@ -32,16 +34,21 @@ static struct kobj_t * __kobj_root = NULL;
 *2022.9.12     1.0        刘杨
 **********************************************************************/
 static struct kobj_t * __kobj_alloc(const char * name, enum kobj_type_t type,\
-									kobj_read_t read, kobj_write_t write, kobj_ioctl_t ioctl, size_t size, void * priv)
+									kobj_read_t read, kobj_write_t write, kobj_ioctl_t ioctl, uint64_t size, void * priv)
 {
 	struct kobj_t * kobj;
 
 	if(!name)
+	 {
+		MK_LOG_TRACE("name is null!\n");
 		return NULL;//名称不为空
-
-	kobj = MK_MALLOC(sizeof(struct kobj_t));//malloc(sizeof(struct kobj_t));//分配字节内存
+	 }
+	kobj = MK_MALLOC(sizeof(struct kobj_t));//分配字节内存
 	if(!kobj)
-		return NULL;//分配失败
+	 {
+	    MK_LOG_TRACE("%s malloc fail!\n",name);
+	    return NULL;//分配失败
+	 }
 
 	kobj->name = strdup(name);//拷贝
 	kobj->type = type;//类型
@@ -89,15 +96,23 @@ struct kobj_t * kobj_get_root(void)
 struct kobj_t * kobj_search(struct kobj_t * parent, const char * name)
 {
 	struct kobj_t * pos, * n;//pos位置,临时变量n
+	if(!name)//名字不为空
+	 {
+		MK_LOG_TRACE("name is null!\n");
+		return NULL;
+	 }
 
 	if(!parent)//参数不为空
-	 return NULL;
+	 {
+		MK_LOG_TRACE("%s parent is null!\n",name);
+		return NULL;
+	 }
 
 	if(parent->type != KOBJ_TYPE_DIR)//类型不是目录
+	 {
+		MK_LOG_TRACE("parent type not KOBJ_TYPE_DIR!\n");
 		return NULL;
-
-	if(!name)//名字不为空
-		return NULL;
+	 }
 
 	list_for_each_entry_safe(pos, n, struct kobj_t,&(parent->children), entry)//循环查找
 	{
@@ -125,31 +140,43 @@ struct kobj_t * kobj_search_directory_with_create(struct kobj_t * parent, const 
 	struct kobj_t * kobj;
 
 	if(!parent)
+	 {
+		MK_LOG_TRACE("parent is NULL!\n");
 		return NULL;
-
+	 }
 	if(parent->type != KOBJ_TYPE_DIR)
-		return NULL;//类型不是目录
-
-	if(!name)
+	 {
+		MK_LOG_TRACE("parent type not KOBJ_TYPE_DIR!\n");
 		return NULL;
+	 }
+	if(!name)
+	 {
+		MK_LOG_TRACE("name is NULL!\n");
+		return NULL;
+	 }
 
 	kobj = kobj_search(parent, name);
 	if(kobj == NULL)
-	{
+	 {
 		kobj = kobj_alloc_directory(name);
 		if(!kobj)
+		 {
+			MK_LOG_TRACE("kobj malloc fail!\n");
 			return NULL;
+		 }
 
 		if(!kobj_add(parent, kobj))
-		{
+		 {
+			MK_LOG_TRACE("kobj add fail!\n");
 			kobj_free(kobj);
 			return NULL;
-		}
-	}
+		 }
+	 }
 	else if(kobj->type != KOBJ_TYPE_DIR)
-	{
+	 {
+		MK_LOG_TRACE("kobj type not KOBJ_TYPE_DIR!\n");
 		return NULL;
-	}
+	 }
 
 	return kobj;
 }
@@ -185,9 +212,33 @@ struct kobj_t * kobj_alloc_directory(const char * name)
 *---------------------------------------------------------------------
 *2022.9.12     1.0        刘杨
 **********************************************************************/
-struct kobj_t * kobj_alloc_regular(const char * name, kobj_read_t read, kobj_write_t write, kobj_ioctl_t ioctl, size_t size, void * priv)
+struct kobj_t * kobj_alloc_regular(const char * name, kobj_read_t read, kobj_write_t write, kobj_ioctl_t ioctl, uint64_t size, void * priv)
 {
 	return __kobj_alloc(name, KOBJ_TYPE_REG, read, write, ioctl, size, priv);
+}
+
+/********************************************************************
+*                      功能函数
+*功能描述： 拷贝字符串
+*输入参数： 字符串
+*返回值：地址或NULL
+*其他说明：无
+*修改日期       版本      修改人        修改内容
+*---------------------------------------------------------------------
+*2022.12.17     1.0        刘杨
+**********************************************************************/
+char *strdup(const char* str)
+{
+    if (str == NULL)
+      return NULL;
+    char* strat = (char*)str;
+    int len = 0;
+    while (*str++ != '\0')
+     len++;
+    char* ret = (char*)MK_MALLOC(len + 1);
+    while ((*ret++ = *strat++) != '\0')
+     {}
+    return ret - (len + 1);
 }
 
 /********************************************************************
@@ -203,7 +254,7 @@ struct kobj_t * kobj_alloc_regular(const char * name, kobj_read_t read, kobj_wri
 uint8_t kobj_free(struct kobj_t * kobj)
 {
 	if(!kobj)
-		return FALSE;
+	 return FALSE;
 	MK_FREE(kobj->name);
 	MK_FREE(kobj);
 	return TRUE;
@@ -224,16 +275,28 @@ uint8_t kobj_free(struct kobj_t * kobj)
 uint8_t kobj_add(struct kobj_t * parent, struct kobj_t * kobj)
 {
 	if(!parent)
+	 {
+		MK_LOG_TRACE("parent is NULL!\n");
 		return FALSE;
+	 }
 
 	if(parent->type != KOBJ_TYPE_DIR)
+	 {
+		MK_LOG_TRACE("parent type not KOBJ_TYPE_DIR!\n");
 		return FALSE;
+	 }
 
 	if(!kobj)
+	 {
+		MK_LOG_TRACE("kobj is NULL!\n");
 		return FALSE;
+	 }
 
 	if(kobj_search(parent, kobj->name))
+	 {
+		MK_LOG_TRACE("parent not kobj name child!\n");
 		return FALSE;
+	 }
 
 	spin_lock_irq();
 	kobj->parent = parent;
@@ -258,15 +321,23 @@ uint8_t kobj_add(struct kobj_t * parent, struct kobj_t * kobj)
 uint8_t kobj_remove(struct kobj_t * parent, struct kobj_t * kobj)
 {
 	struct kobj_t * pos, * n;
-
 	if(!parent)
+	 {
+		MK_LOG_TRACE("parent is NULL!\n");
 		return FALSE;
+	 }
 
 	if(parent->type != KOBJ_TYPE_DIR)
+	 {
+		MK_LOG_TRACE("parent type not KOBJ_TYPE_DIR!\n");
 		return FALSE;
+	 }
 
 	if(!kobj)
+	 {
+		MK_LOG_TRACE("kobj is NULL!\n");
 		return FALSE;
+	 }
 
 	list_for_each_entry_safe(pos, n, struct kobj_t, &(parent->children), entry)
 	 {
@@ -301,23 +372,38 @@ uint8_t kobj_add_directory(struct kobj_t * parent, const char * name)
 	struct kobj_t * kobj;
 
 	if(!parent)
+	 {
+		MK_LOG_TRACE("parent is NULL!\n");
 		return FALSE;
+	 }
 
 	if(parent->type != KOBJ_TYPE_DIR)
+	 {
+		MK_LOG_TRACE("parent type not KOBJ_TYPE_DIR!\n");
 		return FALSE;
+	 }
 
 	if(!name)
+	 {
+		MK_LOG_TRACE("name is NULL!\n");
 		return FALSE;
+	 }
 
 	if(kobj_search(parent, name))
+	 {
+		MK_LOG_TRACE("in parent not search name!\n");
 		return FALSE;
+	 }
 
 	kobj = kobj_alloc_directory(name);
 	if(!kobj)
+	 {
+		MK_LOG_TRACE("kobj malloc fail!\n");
 		return FALSE;
+	 }
 
 	if(!kobj_add(parent, kobj))
-		kobj_free(kobj);
+	 kobj_free(kobj);
 
 	return TRUE;
 }
@@ -331,6 +417,7 @@ uint8_t kobj_add_directory(struct kobj_t * parent, const char * name)
 *		read: 读节点
 *		write: 写节点
 *		ioctl: IO操作
+*		size: 节点的大小
 *		priv: 私有数据块
 *返回值：成功返回真,否则返回假
 *其他说明：无
@@ -339,28 +426,43 @@ uint8_t kobj_add_directory(struct kobj_t * parent, const char * name)
 *2022.9.12     1.0        刘杨
 **********************************************************************/
 uint8_t kobj_add_regular(struct kobj_t * parent, const char * name, \
-						 kobj_read_t read, kobj_write_t write, kobj_ioctl_t ioctl,size_t size, void * priv)
+						 kobj_read_t read, kobj_write_t write, kobj_ioctl_t ioctl, uint64_t size, void * priv)
 {
 	struct kobj_t * kobj;
 
 	if(!parent)
+	 {
+		MK_LOG_TRACE("parent is NULL!\n");
 		return FALSE;
+	 }
 
 	if(parent->type != KOBJ_TYPE_DIR)
+	 {
+		MK_LOG_TRACE("parent type not KOBJ_TYPE_DIR!\n");
 		return FALSE;
+	 }
 
 	if(!name)
+	 {
+		MK_LOG_TRACE("name is NULL!\n");
 		return FALSE;
+	 }
 
 	if(kobj_search(parent, name))
+	 {
+		MK_LOG_TRACE("in parent not search name!\n");
 		return FALSE;
+	 }
 
 	kobj = kobj_alloc_regular(name, read, write, ioctl, size, priv);
 	if(!kobj)
+	 {
+		MK_LOG_TRACE("kobj malloc fail!\n");
 		return FALSE;
+	 }
 
 	if(!kobj_add(parent, kobj))
-		kobj_free(kobj);
+	 kobj_free(kobj);
 
 	return TRUE;
 }
@@ -382,24 +484,27 @@ uint8_t kobj_remove_self(struct kobj_t * kobj)
 	uint8_t ret;
 
 	if(!kobj)
+	 {
+		MK_LOG_TRACE("kobj is NULL!\n");
 		return FALSE;
+	 }
 
 	if(kobj->type == KOBJ_TYPE_DIR)
-	{
+	 {
 		list_for_each_entry_safe(pos, n, struct kobj_t,&(kobj->children), entry)
-		{
+		 {
 			kobj_remove_self(pos);
-		}
-	}
+		 }
+	 }
 
 	parent = kobj->parent;
 	if(parent && (parent != kobj))
-	{
+	 {
 		ret = kobj_remove(parent, kobj);
 		if(ret)
-			kobj_free(kobj);
+		  kobj_free(kobj);
 		return ret;
-	}
+	 }
 
 	kobj_free(kobj);
 	return TRUE;
@@ -419,10 +524,10 @@ uint32_t shash(const char * s)
 {
 	uint32_t v = 5381;
 	if(s)
-	{
+	 {
 		while(*s)
 			v = (v << 5) + v + (*s++);
-	}
-	//MK_LOG_TRACE("string: %s,value: %d\n",s,v);
+	 }
+	MK_LOG_TRACE("string: %s,value: %d\n",s,v);
 	return v;
 }
